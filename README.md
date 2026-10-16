@@ -105,9 +105,24 @@ nginx serves the build and proxies `/api` to `API_UPSTREAM` (default
 `http://host.docker.internal:8080`, i.e. `sona-backend` running on the host). The compose file
 maps `host.docker.internal` for Linux.
 
+## Branching & CI
+
+- `develop` is the default branch. Every change goes on its own branch (`feat/…`, `fix/…`, `ci/…`), is pushed,
+  and is merged into `develop` through a pull request once CI is green.
+- `main` is reserved for releases/deployment: merge `develop` → `main` only to ship.
+- `.github/workflows/ci.yml` runs on pull requests into `develop`/`main` and on pushes to them:
+  1. build and the full test suite (with the coverage gate);
+  2. a Docker image build. Pushes to `develop`/`main` publish it to GitHub Container Registry as
+     `ghcr.io/dev-deee/sona-frontend:<branch>` and `:sha-<commit>`; pull requests only build it.
+
+```bash
+docker pull ghcr.io/dev-deee/sona-frontend:develop
+```
+
 ## Deployment (Vercel)
 
-`main` deploys automatically through `.github/workflows/deploy.yml`.
+Deployment is **not automated yet** — CI builds and publishes the Docker image, and a deploy workflow
+will be added when we go live. The manual steps below describe the intended Vercel setup.
 
 1. Create a Vercel project from this repo (framework: Vite). `vercel.json` adds SPA rewrites and
    cache headers for the service worker.
