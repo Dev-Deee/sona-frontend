@@ -3,7 +3,7 @@ import { tabMeta, type TabId } from '../../tabs/registry'
 import { IconButton } from '../ui/Button'
 import { Icon } from '../ui/icons'
 import { Logo } from './Logo'
-import { ThemeToggle, UnitToggle } from './toggles'
+import { ThemeToggle } from './toggles'
 
 export type Panel = 'history' | 'presets' | 'account' | 'share' | 'search' | null
 
@@ -15,11 +15,14 @@ export function Topbar({
   active,
   calcLabel,
   onOpen,
+  onOpenNav,
 }: {
   active: TabId | 'home'
   /** Label of the calculator on screen, or null when it has no inputs (home, reference). */
   calcLabel: string | null
   onOpen: (panel: Exclude<Panel, null>) => void
+  /** Phones: open the page list from the left. */
+  onOpenNav: () => void
 }) {
   const meta = active === 'home' ? null : tabMeta(active)
   const user = useAuth((s) => s.user)
@@ -46,9 +49,6 @@ export function Topbar({
       <span className="hidden md:inline-flex">
         <ThemeToggle />
       </span>
-      <span className="md:hidden">
-        <UnitToggle compact />
-      </span>
       <IconButton
         label={user ? `Account (${user.email})` : 'Sign in'}
         onClick={() => onOpen('account')}
@@ -62,9 +62,14 @@ export function Topbar({
   return (
     <header className="sticky top-0 z-20 border-b border-divider/70 bg-canvas/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl backdrop-saturate-150">
       <div className="flex h-14 items-center justify-between px-2 md:hidden">
-        <a href="#/" className="pl-2" aria-label="Sona home">
-          <Logo compact />
-        </a>
+        <div className="flex items-center">
+          <IconButton label="Open navigation" onClick={onOpenNav}>
+            <Icon.Menu />
+          </IconButton>
+          <a href="#/" className="pl-1" aria-label="Sona home">
+            <Logo compact markOnly />
+          </a>
+        </div>
         {actions}
       </div>
       <div

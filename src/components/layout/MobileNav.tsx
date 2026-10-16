@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { goHome, navigate } from '../../hooks/useHashRoute'
-import { MOBILE_PRIMARY_TABS, NAV_GROUPS, TABS, type TabId } from '../../tabs/registry'
+import { MOBILE_PRIMARY_TABS, NAV_GROUPS, VISIBLE_TABS, type TabId } from '../../tabs/registry'
 import { Drawer } from '../ui/Drawer'
 import { Icon } from '../ui/icons'
 import { ThemeToggle, UnitToggle } from './toggles'
@@ -38,10 +37,24 @@ function BarButton({
   )
 }
 
-/** Phone navigation: Home + four main pages + More (everything, grouped). */
-export function MobileNav({ active }: { active: TabId | 'home' }) {
-  const [moreOpen, setMoreOpen] = useState(false)
-  const primary = TABS.filter((t) => MOBILE_PRIMARY_TABS.includes(t.id))
+/**
+ * Phone navigation: Home + four main pages + More. The full page list is a drawer that both the
+ * More button (slides in from the right) and the ☰ button in the top bar (from the left) open.
+ */
+export function MobileNav({
+  active,
+  navOpen,
+  navSide,
+  onOpenNav,
+  onCloseNav,
+}: {
+  active: TabId | 'home'
+  navOpen: boolean
+  navSide: 'left' | 'right'
+  onOpenNav: (side: 'left' | 'right') => void
+  onCloseNav: () => void
+}) {
+  const primary = VISIBLE_TABS.filter((t) => MOBILE_PRIMARY_TABS.includes(t.id))
   const moreActive = active !== 'home' && !MOBILE_PRIMARY_TABS.includes(active)
 
   return (
@@ -76,21 +89,21 @@ export function MobileNav({ active }: { active: TabId | 'home' }) {
             <BarButton
               label="More"
               active={moreActive}
-              onClick={() => setMoreOpen(true)}
+              onClick={() => onOpenNav('right')}
               icon={<Icon.More size={20} />}
               popup
             />
           </li>
         </ul>
       </nav>
-      <Drawer open={moreOpen} title="All pages" onClose={() => setMoreOpen(false)}>
+      <Drawer open={navOpen} side={navSide} title="All pages" onClose={onCloseNav}>
         {NAV_GROUPS.map((group) => (
           <section key={group} className="mb-5">
             <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-fg-muted">
               {group}
             </h3>
             <ul className="flex flex-col gap-1">
-              {TABS.filter((t) => t.group === group).map((tab) => {
+              {VISIBLE_TABS.filter((t) => t.group === group).map((tab) => {
                 const TabIcon = tab.icon
                 return (
                   <li key={tab.id}>
@@ -98,7 +111,7 @@ export function MobileNav({ active }: { active: TabId | 'home' }) {
                       type="button"
                       onClick={() => {
                         navigate(tab.id)
-                        setMoreOpen(false)
+                        onCloseNav()
                       }}
                       className={`press flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-sm ${
                         tab.id === active ? 'bg-accent text-accent-fg' : 'text-fg hover:bg-input'

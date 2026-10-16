@@ -4,20 +4,23 @@ import { Icon } from './icons'
 import { springSheet } from './motion'
 
 /**
- * Slide-out panel from the right (full-width sheet on phones). It enters and leaves along the
- * same path, and can be closed mid-animation.
+ * Slide-out panel (full-width sheet on phones). It enters and leaves along the same edge it came
+ * from — `side` should match where its trigger is — and can be closed mid-animation.
  */
 export function Drawer({
   open,
   title,
   onClose,
   children,
+  side = 'right',
 }: {
   open: boolean
   title: string
   onClose: () => void
   children: ReactNode
+  side?: 'left' | 'right'
 }) {
+  const offscreen = side === 'left' ? '-100%' : '100%'
   const titleId = useId()
   const closeRef = useRef<HTMLButtonElement>(null)
 
@@ -32,7 +35,9 @@ export function Drawer({
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-40 flex justify-end">
+        <div
+          className={`fixed inset-0 z-40 flex ${side === 'left' ? 'justify-start' : 'justify-end'}`}
+        >
           <motion.div
             className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
             onClick={onClose}
@@ -46,10 +51,12 @@ export function Drawer({
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="relative flex h-full w-full max-w-md flex-col border-l border-line bg-surface shadow-[0_0_80px_-20px_rgb(0_0_0/0.8)]"
-            initial={{ x: '100%' }}
+            className={`relative flex h-full w-full max-w-md flex-col border-line bg-surface shadow-[0_0_80px_-20px_rgb(0_0_0/0.8)] ${
+              side === 'left' ? 'border-r' : 'border-l'
+            }`}
+            initial={{ x: offscreen }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            exit={{ x: offscreen }}
             transition={springSheet}
           >
             <header className="flex items-center justify-between border-b border-divider px-5 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">

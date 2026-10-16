@@ -4,7 +4,7 @@ import { Icon } from '../components/ui/icons'
 import { spring } from '../components/ui/motion'
 import { useHistory } from '../store/historyStore'
 import { CALCULATORS, findByCalcId } from './calculators'
-import { NAV_GROUPS, TABS, type TabId } from './registry'
+import { NAV_GROUPS, VISIBLE_TABS, type TabId } from './registry'
 import { ALL_CALCULATORS, calcHref, searchCalculators } from './search'
 
 const GROUP_BLURB: Record<string, string> = {
@@ -153,7 +153,7 @@ export function Home({ onOpenSearch }: { onOpenSearch: () => void }) {
                 <p className="hidden text-[13px] text-fg-2 sm:block">{GROUP_BLURB[group]}</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {TABS.filter((t) => t.group === group).map((tab) => {
+                {VISIBLE_TABS.filter((t) => t.group === group).map((tab) => {
                   const TabIcon = tab.icon
                   return (
                     <article

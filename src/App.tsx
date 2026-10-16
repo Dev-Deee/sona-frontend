@@ -12,6 +12,7 @@ import { useSharedLink } from './features/useSharedLink'
 import { useHashRoute } from './hooks/useHashRoute'
 import { useTemperatureAutoFetch } from './hooks/useTemperatureAutoFetch'
 import { useNav } from './store/navStore'
+import { useSettings } from './store/settingsStore'
 import { resolveCalc } from './tabs/calculators'
 import { Home } from './tabs/Home'
 import { DEFAULT_TAB } from './tabs/registry'
@@ -40,6 +41,12 @@ export default function App() {
     setPanel(p)
   }
   const close = () => setPanel(null)
+  // Phone page list: opened by ☰ (from the left) or More (from the right).
+  const [nav, setNav] = useState<{ open: boolean; side: 'left' | 'right' }>({
+    open: false,
+    side: 'left',
+  })
+  const toggleSidebar = useSettings((s) => s.toggleSidebar)
   useTemperatureAutoFetch()
   useSharedLink(route)
 
@@ -56,10 +63,15 @@ export default function App() {
         e.preventDefault()
         setPanel((p) => (p === 'search' ? null : 'search'))
       }
+      // Ctrl/⌘ + B collapses or expands the desktop sidebar.
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        toggleSidebar()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [toggleSidebar])
 
   const calcLabel = !isHome && active.calcId ? active.label : null
 
@@ -69,7 +81,12 @@ export default function App() {
         <Sidebar active={isHome ? 'home' : tab} onOpenSearch={() => open('search')} />
         <div className="flex min-w-0 flex-1 flex-col">
           <OfflineBanner />
-          <Topbar active={isHome ? 'home' : tab} calcLabel={calcLabel} onOpen={open} />
+          <Topbar
+            active={isHome ? 'home' : tab}
+            calcLabel={calcLabel}
+            onOpen={open}
+            onOpenNav={() => setNav({ open: true, side: 'left' })}
+          />
           <main className="flex-1 px-4 pb-28 pt-6 md:px-10 md:pb-16 md:pt-8">
             {isHome ? (
               <Home onOpenSearch={() => open('search')} />
@@ -80,7 +97,13 @@ export default function App() {
             )}
           </main>
         </div>
-        <MobileNav active={isHome ? 'home' : tab} />
+        <MobileNav
+          active={isHome ? 'home' : tab}
+          navOpen={nav.open}
+          navSide={nav.side}
+          onOpenNav={(side) => setNav({ open: true, side })}
+          onCloseNav={() => setNav((n) => ({ ...n, open: false }))}
+        />
         <CommandPalette open={panel === 'search'} onClose={close} />
         <HistoryDrawer open={panel === 'history'} onClose={close} />
         {calcLabel && (

@@ -7,6 +7,7 @@ export type ThemeMode = 'dark' | 'dim' | 'bright'
 export const THEME_KEY = 'sona_theme'
 export const UNITS_KEY = 'sona_units'
 export const TEMPERATURE_KEY = 'sona_temperature'
+export const SIDEBAR_KEY = 'sona_sidebar'
 export const DEFAULT_TEMPERATURE_C = 20
 
 const THEMES: ThemeMode[] = ['dark', 'dim', 'bright']
@@ -53,6 +54,9 @@ interface SettingsState {
   setTheme: (theme: ThemeMode) => void
   cycleTheme: () => void
   setTemperature: (celsius: number | null, source?: 'manual' | 'auto') => void
+  /** Desktop sidebar collapsed to an icon rail. */
+  sidebarCollapsed: boolean
+  toggleSidebar: () => void
 }
 
 const persistTemperature = (c: number | null, manual: boolean) => {
@@ -66,6 +70,12 @@ export const useSettings = create<SettingsState>((set, get) => ({
   theme: initialTheme(),
   temperatureC: temp.value,
   temperatureManual: temp.manual,
+  sidebarCollapsed: readLocal(SIDEBAR_KEY) === 'collapsed',
+  toggleSidebar: () => {
+    const sidebarCollapsed = !get().sidebarCollapsed
+    writeLocal(SIDEBAR_KEY, sidebarCollapsed ? 'collapsed' : 'expanded')
+    set({ sidebarCollapsed })
+  },
   setUnitSystem: (unitSystem) => {
     writeLocal(UNITS_KEY, unitSystem)
     set({ unitSystem })
