@@ -4,7 +4,7 @@ import { shareApi } from '../api/endpoints'
 import { navigate, type Route } from '../hooks/useHashRoute'
 import { toast } from '../store/toastStore'
 import { findByCalcId } from '../tabs/calculators'
-import { DEFAULT_TAB, isTabId } from '../tabs/registry'
+import { DEFAULT_TAB, isVisibleTab } from '../tabs/registry'
 import { applySnapshot } from './snapshot'
 
 /** Opens #/share/<token>: loads the shared inputs and jumps to their tab. */
@@ -16,7 +16,7 @@ export function useSharedLink(route: Route) {
     shareApi
       .get(route.token)
       .then((payload) => {
-        const tab = isTabId(payload.calculatorTab) ? payload.calculatorTab : DEFAULT_TAB
+        const tab = isVisibleTab(payload.calculatorTab) ? payload.calculatorTab : DEFAULT_TAB
         const calcId = applySnapshot(payload.inputs)
         const entry = calcId ? findByCalcId(tab, calcId) : undefined
         navigate(tab, entry?.slug)

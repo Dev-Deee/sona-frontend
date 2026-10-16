@@ -31,6 +31,8 @@ export interface TabMeta {
   subtitle: string
   group: NavGroup
   icon: (props: { size?: number }) => ReactNode
+  /** Hidden pages keep their code but are left out of navigation, Home and search, and can't be opened. */
+  hidden?: boolean
 }
 
 /** Pages in navigation order, grouped by the job they help with. */
@@ -114,10 +116,21 @@ export const TABS: TabMeta[] = [
     subtitle: 'Formulas, constants and tables',
     group: 'Learn',
     icon: Icon.Book,
+    hidden: true,
   },
 ]
 
-export const NAV_GROUPS: NavGroup[] = ['Sound', 'System', 'Show', 'Learn']
+/** Pages people can open: everything not marked hidden. */
+export const VISIBLE_TABS: TabMeta[] = TABS.filter((t) => !t.hidden)
+
+/** Navigation groups that have at least one visible page. */
+export const NAV_GROUPS: NavGroup[] = (['Sound', 'System', 'Show', 'Learn'] as NavGroup[]).filter(
+  (g) => VISIBLE_TABS.some((t) => t.group === g),
+)
+
+/** True for pages that exist and aren't hidden. */
+export const isVisibleTab = (value: unknown): value is TabId =>
+  isTabId(value) && !TABS.find((t) => t.id === value)?.hidden
 
 export const tabMeta = (id: TabId) => TABS.find((t) => t.id === id) as TabMeta
 

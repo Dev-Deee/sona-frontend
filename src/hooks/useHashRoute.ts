@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DEFAULT_TAB, isTabId, type TabId } from '../tabs/registry'
+import { DEFAULT_TAB, isTabId, isVisibleTab, type TabId } from '../tabs/registry'
 
 /** `calc` is the calculator slug within the tab, e.g. #/acoustics/rt60. */
 export type Route =
@@ -10,6 +10,8 @@ export function parseHash(hash: string): Route {
   const [first, second] = path.split('/')
   if (first === 'share' && second) return { kind: 'share', token: decodeURIComponent(second) }
   if (!first) return { kind: 'home' }
+  // Hidden pages (e.g. Reference) send people Home rather than to a page they can't navigate.
+  if (isTabId(first) && !isVisibleTab(first)) return { kind: 'home' }
   if (!isTabId(first)) return { kind: 'tab', tab: DEFAULT_TAB }
   return second
     ? { kind: 'tab', tab: first, calc: decodeURIComponent(second) }

@@ -1,4 +1,11 @@
-export function Logo({ compact = false }: { compact?: boolean }) {
+/** `markOnly` drops the wordmark where space is tight (phone top bar). */
+export function Logo({
+  compact = false,
+  markOnly = false,
+}: {
+  compact?: boolean
+  markOnly?: boolean
+}) {
   return (
     <div className="flex items-center gap-2">
       <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
@@ -10,11 +17,13 @@ export function Logo({ compact = false }: { compact?: boolean }) {
           <path d="M43.7 12.6a27.4 27.4 0 0 1 0 38.8" />
         </g>
       </svg>
-      <span
-        className={`font-semibold tracking-[0.25em] text-fg ${compact ? 'text-sm' : 'text-base'}`}
-      >
-        SONA
-      </span>
+      {!markOnly && (
+        <span
+          className={`font-semibold tracking-[0.25em] text-fg ${compact ? 'text-sm' : 'text-base'}`}
+        >
+          SONA
+        </span>
+      )}
     </div>
   )
 }

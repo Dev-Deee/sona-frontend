@@ -112,6 +112,8 @@ describe('routing', () => {
     expect(parseHash('#/nope')).toEqual({ kind: 'tab', tab: 'acoustics' })
     expect(parseHash('')).toEqual({ kind: 'home' })
     expect(parseHash('#/')).toEqual({ kind: 'home' })
+    // Reference is hidden: its old links go Home.
+    expect(parseHash('#/reference/formulas')).toEqual({ kind: 'home' })
     expect(parseHash('#/share/abc123')).toEqual({ kind: 'share', token: 'abc123' })
     expect(parseHash('#/acoustics/rt60')).toEqual({ kind: 'tab', tab: 'acoustics', calc: 'rt60' })
   })
@@ -141,7 +143,9 @@ describe('PWA', () => {
 
 describe('calculator search', () => {
   it('indexes every calculator', () => {
-    expect(ALL_CALCULATORS).toHaveLength(49)
+    expect(ALL_CALCULATORS).toHaveLength(42)
+    expect(ALL_CALCULATORS.some((x) => x.tab.id === 'reference')).toBe(false)
+    expect(searchCalculators('formulas')).toEqual([])
   })
   it('finds calculators by plain words, technical terms and questions', () => {
     expect(searchCalculators('reverb')[0].calc.slug).toBe('rt60')

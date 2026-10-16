@@ -139,4 +139,34 @@ describe('App', () => {
     await user.keyboard('{Enter}')
     expect(window.location.hash).toBe('#/intelligibility/feedback')
   })
+
+  it('collapses and expands the sidebar, remembering the choice', async () => {
+    const user = userEvent.setup()
+    useSettings.setState({ sidebarCollapsed: false })
+    render(<App />)
+    const toggle = screen.getByRole('button', { name: 'Collapse navigation' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await user.click(toggle)
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+    expect(localStorage.getItem('sona_sidebar')).toBe('collapsed')
+    // Collapsed links keep an accessible name.
+    expect(screen.getByRole('link', { name: 'Coverage & Delays' })).toBeInTheDocument()
+    await user.keyboard('{Control>}b{/Control}')
+    expect(useSettings.getState().sidebarCollapsed).toBe(false)
+    expect(localStorage.getItem('sona_sidebar')).toBe('expanded')
+  })
+
+  it('opens the page list from the hamburger on phones and hides Reference everywhere', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/'
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Open navigation' }))
+    const drawer = await screen.findByRole('dialog', { name: 'All pages' })
+    expect(within(drawer).getByRole('button', { name: /Wireless/ })).toBeInTheDocument()
+    expect(within(drawer).queryByRole('button', { name: /Reference/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Reference' })).not.toBeInTheDocument()
+  })
 })

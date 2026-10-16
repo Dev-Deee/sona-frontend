@@ -1,5 +1,5 @@
 import { CALCULATORS, type CalcEntry } from './calculators'
-import { TABS, type TabId, type TabMeta } from './registry'
+import { VISIBLE_TABS, type TabId, type TabMeta } from './registry'
 
 export interface SearchHit {
   tab: TabMeta
@@ -14,8 +14,8 @@ const normalise = (s: string) =>
     .replace(/[^\p{L}\p{N}%]+/gu, ' ')
     .trim()
 
-/** Every calculator, in navigation order. */
-export const ALL_CALCULATORS: { tab: TabMeta; calc: CalcEntry }[] = TABS.flatMap((tab) =>
+/** Every calculator on a visible page, in navigation order. */
+export const ALL_CALCULATORS: { tab: TabMeta; calc: CalcEntry }[] = VISIBLE_TABS.flatMap((tab) =>
   CALCULATORS[tab.id].map((calc) => ({ tab, calc })),
 )
 
