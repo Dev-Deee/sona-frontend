@@ -1,0 +1,260 @@
+@import 'tailwindcss';
+
+/* Design tokens. Dark is the default; Dim and Bright redefine the same roles. */
+:root,
+[data-theme='dark'] {
+  --bg-base: #0d0d0d;
+  --bg-surface: #141414;
+  --bg-input: #1a1a1a;
+  --bg-border: #2a2a2a;
+  --bg-divider: #1e1e1e;
+
+  --teal-950: #134e4a;
+  --teal-300: #5eead4;
+  --amber-950: #451a03;
+  --amber-400: #fbbf24;
+  --amber-600: #d97706;
+  --blue-950: #172554;
+  --blue-300: #93c5fd;
+
+  --text-primary: #e5e5e5;
+  --text-secondary: #888888;
+  --text-muted: #444444;
+  --text-hint: #333333;
+
+  /* Semantic roles */
+  --accent-bg: var(--teal-950);
+  --accent-fg: var(--teal-300);
+  /* Teal text on a neutral (non-teal) background. */
+  --accent-ink: var(--teal-300);
+  --out-bg: color-mix(in srgb, var(--amber-950) 45%, transparent);
+  --out-fg: var(--amber-400);
+  --out-2: var(--amber-600);
+  --const-bg: color-mix(in srgb, var(--blue-950) 70%, transparent);
+  --const-fg: var(--blue-300);
+  --good: #4ade80;
+  --ok: #a3e635;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  /* Muted text needs a little more contrast than #444 to stay legible as hint copy. */
+  --text-muted-legible: #6b6b6b;
+
+  color-scheme: dark;
+}
+
+/* FOH in a lit room. */
+[data-theme='dim'] {
+  --bg-base: #1a1a1a;
+  --bg-surface: #222222;
+  --bg-input: #2a2a2a;
+  --bg-border: #3a3a3a;
+  --bg-divider: #2c2c2c;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a3a3a3;
+  --text-muted: #6b6b6b;
+  --text-hint: #555555;
+  --text-muted-legible: #7a7a7a;
+}
+
+/* Daylight / outdoor: full light mode with inverted text. */
+[data-theme='bright'] {
+  --bg-base: #ffffff;
+  --bg-surface: #f6f6f6;
+  --bg-input: #ffffff;
+  --bg-border: #d4d4d4;
+  --bg-divider: #e5e5e5;
+  --text-primary: #111111;
+  --text-secondary: #525252;
+  --text-muted: #a3a3a3;
+  --text-hint: #d4d4d4;
+  --text-muted-legible: #737373;
+
+  --accent-bg: var(--teal-950);
+  --accent-fg: #ccfbf1;
+  --accent-ink: #0f766e;
+  --out-bg: #fef3c7;
+  --out-fg: #92400e;
+  --out-2: #b45309;
+  --const-bg: #dbeafe;
+  --const-fg: #1e3a8a;
+  --good: #15803d;
+  --ok: #4d7c0f;
+  --warn: #b45309;
+  --bad: #b91c1c;
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-canvas: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-input: var(--bg-input);
+  --color-line: var(--bg-border);
+  --color-divider: var(--bg-divider);
+  --color-accent: var(--accent-bg);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-ink: var(--accent-ink);
+  --color-out: var(--out-bg);
+  --color-out-fg: var(--out-fg);
+  --color-out-2: var(--out-2);
+  --color-const: var(--const-bg);
+  --color-const-fg: var(--const-fg);
+  --color-fg: var(--text-primary);
+  --color-fg-2: var(--text-secondary);
+  --color-fg-muted: var(--text-muted-legible);
+  --color-fg-hint: var(--text-hint);
+  --color-good: var(--good);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  /* Montserrat for interface and numbers; Lora for titles, descriptions and formulas. */
+  --font-sans:
+    'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-serif: 'Lora Variable', 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+/* Numbers: Montserrat with tabular figures so columns of results line up and don't jitter. */
+@utility font-num {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1;
+}
+
+html,
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'lnum' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+
+/* In the base layer so Tailwind utilities (text-sm, font-medium…) can still override it. */
+@layer base {
+  input,
+  select,
+  button {
+    font: inherit;
+  }
+}
+
+/* ─── Surfaces ───────────────────────────────────────────────────────────────────── */
+
+/* A faint teal glow from the top-left gives the page depth without competing with content. */
+.app-bg {
+  background:
+    radial-gradient(
+      1100px 520px at 12% -12%,
+      color-mix(in srgb, var(--teal-950) 55%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 480px at 100% 0%,
+      color-mix(in srgb, var(--blue-950) 35%, transparent),
+      transparent 60%
+    ),
+    var(--bg-base);
+  background-attachment: fixed;
+}
+
+/* Cards: a bright top edge (light catching the surface) and a long soft shadow. */
+.card {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.045),
+    0 1px 0 0 var(--bg-divider),
+    0 24px 48px -28px rgb(0 0 0 / 0.65);
+}
+
+[data-theme='bright'] .card {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 18px 40px -24px rgb(0 0 0 / 0.18);
+}
+
+[data-theme='bright'] .app-bg {
+  background:
+    radial-gradient(
+      1100px 520px at 12% -12%,
+      color-mix(in srgb, #99f6e4 35%, transparent),
+      transparent 62%
+    ),
+    var(--bg-base);
+}
+
+/* The results side of a calculator sits on a slightly deeper surface. */
+.results-pane {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-base) 55%, transparent),
+    transparent 85%
+  );
+}
+
+.output {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+/* Instant feedback on press (pointer-down), released quickly. */
+.press {
+  transition-property: transform, background-color, border-color, color, box-shadow;
+  transition-duration: 160ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+.press:active {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+/* Horizontally scrolling strips fade at the edges instead of being cut off. */
+@media (max-width: 767px) {
+  .fade-edges {
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 16px,
+      #000 calc(100% - 24px),
+      transparent 100%
+    );
+  }
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press,
+  .press:active {
+    transform: none;
+    transition-duration: 0ms;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .backdrop-blur-xl,
+  .backdrop-blur-sm {
+    backdrop-filter: none;
+  }
+}
