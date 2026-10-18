@@ -60,6 +60,12 @@ describe('speaker library data', () => {
     }
   })
 
+  it('links every verified speaker to its official source', () => {
+    const verified = SPEAKERS.filter((s) => s.verified)
+    expect(verified.length).toBeGreaterThan(300)
+    for (const s of verified) expect(s.sourceUrl).toMatch(/^https:\/\//)
+  })
+
   it('takes max SPL from the sheet, else sensitivity + 10·log(power)', () => {
     expect(getSplAt1m(base)).toBe(130)
     expect(getSplAt1m({ ...base, maxSplAt1m: 141 })).toBe(141)
@@ -104,13 +110,13 @@ describe('speaker picker', () => {
       'aria-pressed',
       'true',
     )
-    await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
-    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LYON/ }))
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'leopard')
+    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LEOPARD(?!-)/ }))
     await waitFor(() =>
       expect(screen.queryByRole('dialog', { name: 'Speaker library' })).not.toBeInTheDocument(),
     )
 
-    // Meyer LYON is self-powered with a published max SPL.
+    // Meyer LEOPARD is self-powered with a published max SPL.
     expect(within(region).getByRole('radio', { name: 'Active (powered)' })).toHaveAttribute(
       'aria-checked',
       'true',
@@ -124,7 +130,7 @@ describe('speaker picker', () => {
     await user.clear(spl)
     await user.type(spl, '140')
     expect(useInputsStore.getState().values['coverage.delayPlanner'].mainMaxSpl).toBe(140)
-    await user.click(within(region).getByRole('button', { name: /Meyer Sound LYON selected/ }))
+    await user.click(within(region).getByRole('button', { name: /Meyer Sound LEOPARD selected/ }))
     expect(within(region).getByRole('button', { name: 'Pick your main speaker' })).toBeVisible()
   })
 
@@ -166,12 +172,12 @@ describe('speaker picker', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
     await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
     await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
-    // 12 × 24.2 kg
-    expect(screen.getByLabelText('Array weight')).toHaveValue('290.4')
+    // 12 × 60 kg
+    expect(screen.getByLabelText('Array weight')).toHaveValue('720')
     const boxes = screen.getByLabelText('Boxes in the hang')
     await user.clear(boxes)
     await user.type(boxes, '8')
-    expect(screen.getByLabelText('Array weight')).toHaveValue('193.6')
+    expect(screen.getByLabelText('Array weight')).toHaveValue('480')
   })
 
   it('compares the actual main and delay speakers in “Need delays?”', async () => {
@@ -179,8 +185,8 @@ describe('speaker picker', () => {
     render(<NeedDelaysCard />)
     await user.click(screen.getByRole('button', { name: 'Pick the main speaker' }))
     let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
-    await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
-    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LYON/ }))
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'leopard')
+    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LEOPARD(?!-)/ }))
     expect(screen.getByLabelText('Main max SPL at 1 m')).toHaveValue('142')
     expect(screen.getByText('Mains max at the listener')).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
@@ -209,14 +215,14 @@ describe('speaker picker', () => {
     let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
     await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
     await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
-    expect(screen.getByLabelText('Reference SPL')).toHaveValue('141')
+    expect(screen.getByLabelText('Reference SPL')).toHaveValue('145')
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
 
     await user.click(far)
     dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
     await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
     await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
-    expect(screen.getByLabelText('Coverage angle')).toHaveValue('100')
+    expect(screen.getByLabelText('Coverage angle')).toHaveValue('80')
   })
 
   it('compares two picked speakers for comb filtering', async () => {
@@ -226,8 +232,8 @@ describe('speaker picker', () => {
     expect(screen.getByText('Strong comb filtering')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Pick speaker A' }))
     let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
-    await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
-    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LYON/ }))
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'leopard')
+    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LEOPARD(?!-)/ }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: 'Pick speaker B' }))
     dialog = await screen.findByRole('dialog', { name: 'Speaker library' })

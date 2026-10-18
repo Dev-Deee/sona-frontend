@@ -211,6 +211,11 @@ export function SpeakerPickerModal({
                         </span>
                         <span className="text-[12px] leading-snug text-fg-muted">
                           {specLine(s)}
+                          {!s.verified && (
+                            <span className="ml-1.5 rounded border border-warn/50 px-1 text-[10px] font-semibold uppercase tracking-wider text-warn">
+                              Unverified
+                            </span>
+                          )}
                         </span>
                       </button>
                     </li>
@@ -285,9 +290,24 @@ export function SpeakerSelect({
         </button>
       )}
       <span className="text-xs leading-snug text-fg-muted">
-        {speaker
-          ? 'Specs filled from the datasheet — you can still change any value.'
-          : 'Or type the values from your spec sheet below.'}
+        {!speaker ? (
+          'Or type the values from your spec sheet below.'
+        ) : speaker.verified && speaker.sourceUrl ? (
+          <>
+            Specs filled from the{' '}
+            <a
+              href={speaker.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent-ink underline underline-offset-2"
+            >
+              manufacturer’s datasheet
+            </a>{' '}
+            — you can still change any value.
+          </>
+        ) : (
+          'Unverified values — check them against your spec sheet.'
+        )}
       </span>
       <SpeakerPickerModal
         key={session}
