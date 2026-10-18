@@ -3,8 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { DelayTowerPlannerCard } from '../components/calculator/cards/delayTower'
 import { RiggingLoadCard } from '../components/calculator/cards/showTools'
+import { CombFilterCard } from '../components/calculator/cards/arrays'
+import { CriticalDistanceCard } from '../components/calculator/cards/acoustics'
 import {
   AspectRatioCard,
+  AsymmetricCoverageCard,
+  CoverageAngleCard,
   InverseSquareCard,
   NeedDelaysCard,
 } from '../components/calculator/cards/coverage'
@@ -32,6 +36,7 @@ const base: Speaker = {
   vCoverage: 40,
   freqResponse: null,
   weightKg: 20,
+  impedanceOhm: 8,
   notes: null,
   sourceUrl: null,
   verified: false,
@@ -172,7 +177,6 @@ describe('speaker picker', () => {
   it('compares the actual main and delay speakers in “Need delays?”', async () => {
     const user = userEvent.setup()
     render(<NeedDelaysCard />)
-    await user.click(screen.getByText('Compare the actual speakers'))
     await user.click(screen.getByRole('button', { name: 'Pick the main speaker' }))
     let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
     await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
@@ -213,5 +217,57 @@ describe('speaker picker', () => {
     await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
     await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
     expect(screen.getByLabelText('Coverage angle')).toHaveValue('100')
+  })
+
+  it('compares two picked speakers for comb filtering', async () => {
+    const user = userEvent.setup()
+    render(<CombFilterCard />)
+    // Default: two identical speakers 4 m apart, seat 10 m out and 3 m towards B.
+    expect(screen.getByText('Strong comb filtering')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Pick speaker A' }))
+    let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
+    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LYON/ }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Pick speaker B' }))
+    dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'qsc k12.2')
+    await user.click(within(dialog).getAllByRole('button', { name: /QSC K12\.2/ })[0])
+    // B is 10 dB quieter on paper, which softens the notches.
+    expect(screen.getByText('Noticeable')).toBeInTheDocument()
+    expect(document.body.textContent).not.toMatch(/NaN|Infinity|undefined/)
+    await user.click(screen.getByRole('radio', { name: 'A reflection / two paths' }))
+    expect(screen.getByLabelText('Direct path')).toBeInTheDocument()
+  })
+
+  it('checks a speaker’s pattern against the angle needed', async () => {
+    const user = userEvent.setup()
+    render(<CoverageAngleCard />)
+    // 20 m wide at 12 m needs 79.6°.
+    await user.click(screen.getByRole('button', { name: 'Check a speaker' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'qsc k12.2')
+    await user.click(within(dialog).getAllByRole('button', { name: /QSC K12\.2/ })[0])
+    expect(document.querySelector('[data-check="fail"]')).toHaveTextContent(/75° horizontal/)
+  })
+
+  it('explains that line arrays have no fixed vertical coverage', async () => {
+    const user = userEvent.setup()
+    render(<AsymmetricCoverageCard />)
+    await user.click(screen.getByRole('button', { name: 'Check a speaker' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
+    await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
+    expect(document.querySelector('[data-check="warn"]')).toHaveTextContent(/splay/)
+  })
+
+  it('stretches critical distance by the speaker’s directivity', async () => {
+    const user = userEvent.setup()
+    render(<CriticalDistanceCard />)
+    await user.click(screen.getByText('Your speaker’s directivity'))
+    await user.type(screen.getByLabelText('Horizontal coverage'), '90')
+    await user.type(screen.getByLabelText('Vertical coverage'), '60')
+    expect(screen.getByText('Critical distance with your speaker')).toBeInTheDocument()
+    expect(screen.getByText(/Q ≈ 8\.7/)).toBeInTheDocument()
   })
 })

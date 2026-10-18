@@ -144,6 +144,28 @@ export function criticalDistance(
   return ok(0.057 * Math.sqrt((volumeM3 as number) / (rt60s as number)))
 }
 
+/**
+ * Directivity factor Q from a speaker's nominal coverage (Molloy):
+ * Q = 180° / asin(sin(H/2)·sin(V/2)).
+ */
+export function directivityQ(
+  hDeg: number | null | undefined,
+  vDeg: number | null | undefined,
+): CalcResult<number> {
+  const err = firstError(
+    requirePositive(hDeg, 'horizontal coverage'),
+    requirePositive(vDeg, 'vertical coverage'),
+  )
+  if (err) return fail(err)
+  if ((hDeg as number) > 180 || (vDeg as number) > 180)
+    return fail('Coverage angles must be 180° or less')
+  const rad = Math.PI / 180
+  const a = Math.asin(
+    Math.sin(((hDeg as number) * rad) / 2) * Math.sin(((vDeg as number) * rad) / 2),
+  )
+  return ok(180 / (a / rad))
+}
+
 export interface RoomModes {
   length: number[]
   width: number[]

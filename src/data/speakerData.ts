@@ -19,6 +19,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 24.2,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Requires d&b D80 or D80 4CH amplifier. maxSplAt1m = peak (4× AES). Power = AES continuous; program = 3600 W peak.',
     sourceUrl: null,
@@ -37,6 +38,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 31.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Requires d&b D80 amplifier. maxSplAt1m = peak. Power = AES continuous; program = 4800 W peak.',
     sourceUrl: null,
@@ -55,6 +57,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 17.0,
+    impedanceOhm: null,
     notes: 'Passive 3-way. Requires d&b D80 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -72,6 +75,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 23.5,
+    impedanceOhm: null,
     notes: 'Passive 3-way. Requires d&b D80 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -89,6 +93,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 14.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Wide-format line array. Requires d&b D80 or D40 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -107,6 +112,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 22.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Supports cardioid subwoofer configuration when paired with KSL12Sub. Requires d&b D80. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -125,6 +131,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '70 Hz – 18 kHz',
     weightKg: 10.5,
+    impedanceOhm: null,
     notes:
       'Passive 2-way. Installation line array element. Requires d&b D20 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -143,6 +150,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 16.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Installation line array element. Requires d&b D40 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -161,6 +169,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 55.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Flagship touring line array. Requires LA12X or LA8 amplified controller. maxSplAt1m = peak continuous, B-noise. Power = AES.',
     sourceUrl: null,
@@ -179,6 +188,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 35.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way, variable H (70°/90°/110°) via adjustable waveguide. Requires LA8 or LA12X. maxSplAt1m = peak. Power = AES.',
     sourceUrl: null,
@@ -197,6 +207,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 20.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way, variable H dispersion (90° or 110°). Mid-size touring. Requires LA4X or LA8. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -215,6 +226,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 20 kHz',
     weightKg: 14.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way, compact WST line source. Requires LA4X or LA8. maxSplAt1m = peak, half-space. Power = AES.',
     sourceUrl: null,
@@ -233,6 +245,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 15,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 16.4,
+    impedanceOhm: null,
     notes:
       'Passive 3-way, wide-format arc element. H 110°, V 15°. Requires LA4X or LA8. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -251,6 +264,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 15,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 16.4,
+    impedanceOhm: null,
     notes:
       'Passive 3-way, focused arc element. H 60°, V 15°. Shares enclosure with ARCS Wide. Requires LA4X or LA8. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -269,6 +283,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 34.0,
+    impedanceOhm: null,
     notes:
       'Self-powered. 3-channel Class D amp, 3900 W peak. H 110° (80° also available per rigging config). maxSplAt1m = peak M-noise.',
     sourceUrl: null,
@@ -287,6 +302,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 34.0,
+    impedanceOhm: null,
     notes:
       'Self-powered. 3-channel Class D, 3900 W peak. 2×9-in LF + 3-in HF compression driver. maxSplAt1m = peak (B-noise). M-noise linear peak = 133.5 dB.',
     sourceUrl: null,
@@ -305,6 +321,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 60.0,
+    impedanceOhm: null,
     notes:
       'Self-powered flagship touring line array. 6000 W peak amplifier. maxSplAt1m = peak. Specs from press materials — verify official Meyer Sound datasheet before shipping.',
     sourceUrl: null,
@@ -323,6 +340,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 20 kHz',
     weightKg: 10.9,
+    impedanceOhm: null,
     notes:
       'Self-powered compact line array. 1700 W peak. Used for small-to-medium venues and flown fills. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -341,6 +359,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 19.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Mid-format touring line array. Requires NXAMP4x4Mk2 or compatible amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -359,6 +378,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 14.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Compact touring/install line array. Requires Nexo NXAMP. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -377,6 +397,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '55 Hz – 20 kHz',
     weightKg: 36.5,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Part of Nexo STM system (modular). Requires NXAMP4x4Mk2. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -395,6 +416,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '50 Hz – 20 kHz',
     weightKg: 38.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Flagship touring line array with 15-in LF. Requires Lab.gruppen PLM series or similar. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -413,6 +435,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 27.5,
+    impedanceOhm: null,
     notes: 'Passive 3-way. Requires external amplification. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -430,6 +453,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 20 kHz',
     weightKg: 16.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Compact touring/install line array. Requires external amplification. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -448,6 +472,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '80 Hz – 16 kHz',
     weightKg: 109.3,
+    impedanceOhm: null,
     notes:
       'Passive 3-way (2×12 LF + 2×10 MF + 2×2-in HF). maxSplAt1m = LF peak (MF 142 dB / HF 144 dB peak). Total power = LF 2000 + MF 800 + HF 300 W. Weight 109.3 kg.',
     sourceUrl: null,
@@ -466,6 +491,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 62.0,
+    impedanceOhm: null,
     notes:
       'Self-powered large-format line array with onboard DSP. 10 000 W peak total. maxSplAt1m = peak. Supports Dante networking.',
     sourceUrl: null,
@@ -484,6 +510,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '50 Hz – 20 kHz',
     weightKg: 32.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Flagship JBL touring line array. Requires Crown iTech HD amplifier. maxSplAt1m = peak continuous.',
     sourceUrl: null,
@@ -502,6 +529,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 21.0,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. Mid-format JBL touring line array. Requires Crown iTech HD. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -520,6 +548,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '80 Hz – 20 kHz',
     weightKg: 6.5,
+    impedanceOhm: null,
     notes:
       'Passive compact column/line array element. Requires external amp. Popular in HoW and installed audio markets.',
     sourceUrl: null,
@@ -538,6 +567,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '65 Hz – 20 kHz',
     weightKg: 10.5,
+    impedanceOhm: null,
     notes:
       'Self-powered compact line array module. 6.5-in LF + HF compression driver. 1400 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -556,6 +586,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 13.0,
+    impedanceOhm: null,
     notes: 'Passive 2-way compact install/touring. Requires d&b D20 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -573,6 +604,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '55 Hz – 18 kHz',
     weightKg: 22.0,
+    impedanceOhm: null,
     notes: 'Passive 3-way. Requires d&b D40 or D80 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -590,6 +622,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 14.5,
+    impedanceOhm: null,
     notes:
       'Passive 2-way installation loudspeaker. Requires d&b D20 or D40 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -608,6 +641,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 75,
     freqResponse: '45 Hz – 20 kHz',
     weightKg: 16.6,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way. 2000 W peak Class D. Symmetrical 75°×75° coverage. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -626,6 +660,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 75,
     freqResponse: '50 Hz – 20 kHz',
     weightKg: 14.0,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 2000 W peak Class D. 10-in woofer. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -643,6 +678,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 75,
     freqResponse: '53 Hz – 20 kHz',
     weightKg: 10.9,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 2000 W peak Class D. 8-in woofer. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -660,6 +696,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 55,
     freqResponse: '47 Hz – 20 kHz',
     weightKg: 17.6,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 2000 W peak Class D. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -677,6 +714,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 55,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 27.0,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 15-in woofer. 2100 W peak total. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -694,6 +732,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 55,
     freqResponse: '47 Hz – 20 kHz',
     weightKg: 19.5,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 12-in woofer. 1400 W peak total. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -711,6 +750,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '52 Hz – 20 kHz',
     weightKg: 16.3,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way. 1200 W peak Class D. maxSplAt1m = peak. Bluetooth control via QuickSmart Mobile app.',
     sourceUrl: null,
@@ -729,6 +769,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '55 Hz – 20 kHz',
     weightKg: 12.9,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way with Bluetooth audio. 1000 W peak. Budget/portable market. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -747,6 +788,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 15.9,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way with flexible array top. 1000 W peak total. Adjustable vertical coverage via array position. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -765,6 +807,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '47 Hz – 20 kHz',
     weightKg: 15.9,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way. 15-in woofer. 1300 W peak. Bluetooth-enabled with JBL app. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -783,6 +826,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 37.2,
+    impedanceOhm: null,
     notes:
       'Self-powered 3-way. 15-in LF. 2000 W peak Crown Class D amp. maxSplAt1m = peak. Onboard DSP, Wi-Fi control.',
     sourceUrl: null,
@@ -801,6 +845,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '55 Hz – 20 kHz',
     weightKg: 11.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way. Popular in African, Middle Eastern, and HoW markets. 1200 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -819,6 +864,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 55,
     freqResponse: '45 Hz – 20 kHz',
     weightKg: 22.5,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way. 14-in woofer. 2000 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -836,6 +882,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 40,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 23.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 3-way narrow-format for long-throw applications. 1600 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -854,6 +901,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '60 Hz – 20 kHz',
     weightKg: 17.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way. 15-in woofer. Specs from authorized distributor listings — verify with fbt.it.',
     sourceUrl: null,
@@ -872,6 +920,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '65 Hz – 20 kHz',
     weightKg: 15.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way install-grade speaker. Popular in HoW markets. Specs from authorized distributor listings — verify with fbt.it.',
     sourceUrl: null,
@@ -890,6 +939,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 50,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 22.7,
+    impedanceOhm: null,
     notes:
       'Passive 2-way install speaker. 15-in woofer. Sensitivity = 104 dB/W/m. Power = AES continuous; program = 1200 W. Popular for HoW and installation.',
     sourceUrl: null,
@@ -908,6 +958,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 90,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 15.5,
+    impedanceOhm: null,
     notes:
       'Passive 2-way. Dual Concentric driver. Sensitivity = 97 dB/W/m. Power = AES continuous; program = 700 W.',
     sourceUrl: null,
@@ -926,6 +977,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '70 Hz – 18 kHz',
     weightKg: 17.0,
+    impedanceOhm: null,
     notes:
       'Passive 2-way install/surface-mount. Sensitivity = 96 dB/W/m. Power = AES continuous; program = 800 W.',
     sourceUrl: null,
@@ -944,6 +996,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '40 Hz – 20 kHz',
     weightKg: 31.7,
+    impedanceOhm: null,
     notes:
       'Passive 3-way. 15-in LF. Sensitivity = 100 dB/W/m. Power = AES continuous; program = 1600 W, peak = 3200 W.',
     sourceUrl: null,
@@ -962,6 +1015,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '30 Hz – 100 Hz',
     weightKg: 148.0,
+    impedanceOhm: null,
     notes:
       'Passive dual 21-in sub. Requires d&b D80 amplifier. maxSplAt1m = peak. Groundstacking touring sub.',
     sourceUrl: null,
@@ -980,6 +1034,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '35 Hz – 100 Hz',
     weightKg: 73.0,
+    impedanceOhm: null,
     notes:
       'Passive dual 18-in sub. Requires d&b D80 amplifier. maxSplAt1m = peak. Can be used in cardioid arrays.',
     sourceUrl: null,
@@ -998,6 +1053,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '45 Hz – 150 Hz',
     weightKg: 29.0,
+    impedanceOhm: null,
     notes:
       'Passive single 18-in sub. Requires d&b D20 or D40 amplifier. maxSplAt1m = peak. Portable touring/install.',
     sourceUrl: null,
@@ -1016,6 +1072,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '25 Hz – 100 Hz',
     weightKg: 94.0,
+    impedanceOhm: null,
     notes:
       'Passive dual 18-in sub. Requires LA12X or LA8. maxSplAt1m = peak (pink noise). Supports cardioid configuration. Power = AES.',
     sourceUrl: null,
@@ -1034,6 +1091,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '30 Hz – 117 Hz',
     weightKg: 93.0,
+    impedanceOhm: null,
     notes:
       'Passive single 28-in sub. Requires LA12X or LA8. maxSplAt1m = 142 dB peak half-space. Usable -6 dB BW: 33–70 Hz.',
     sourceUrl: null,
@@ -1052,6 +1110,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '38 Hz – 120 Hz',
     weightKg: 40.0,
+    impedanceOhm: null,
     notes:
       'Passive single 18-in sub. Requires LA4X or LA8. maxSplAt1m = peak. Compact touring sub. Power = AES.',
     sourceUrl: null,
@@ -1070,6 +1129,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '25 Hz – 125 Hz',
     weightKg: 115.0,
+    impedanceOhm: null,
     notes: 'Self-powered. 5200 W peak. Used with LYON, LEOPARD systems. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1087,6 +1147,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '30 Hz – 125 Hz',
     weightKg: 83.0,
+    impedanceOhm: null,
     notes:
       'Self-powered single large-format LF sub. 4000 W peak. Pairs with MILO, MICA, LYON arrays. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1105,6 +1166,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '30 Hz – 130 Hz',
     weightKg: 78.0,
+    impedanceOhm: null,
     notes: 'Self-powered touring sub. 4000 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1122,6 +1184,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '38 Hz – 100 Hz',
     weightKg: 39.1,
+    impedanceOhm: null,
     notes:
       'Self-powered dual 12-in cardioid sub. 3600 W peak. Built-in cardioid mode. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1140,6 +1203,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '35 Hz – 100 Hz',
     weightKg: 47.5,
+    impedanceOhm: null,
     notes: 'Self-powered single 18-in sub. 3600 W peak Class D. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1157,6 +1221,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '38 Hz – 124 Hz',
     weightKg: 40.0,
+    impedanceOhm: null,
     notes:
       'Self-powered single 18-in sub. 1000 W continuous / 2000 W peak Class D. maxSplAt1m = peak. Discontinued; successor is KS118.',
     sourceUrl: null,
@@ -1175,6 +1240,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '36 Hz – 160 Hz',
     weightKg: 36.5,
+    impedanceOhm: null,
     notes: 'Self-powered 18-in sub. 1020 W RMS. D-XSUB cardioid mode available. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1192,6 +1258,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '38 Hz – 135 Hz',
     weightKg: 38.0,
+    impedanceOhm: null,
     notes:
       'Self-powered 18-in sub. 2000 W peak Crown Class D. maxSplAt1m = peak. Onboard DSP, Wi-Fi control.',
     sourceUrl: null,
@@ -1210,6 +1277,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '40 Hz – 160 Hz',
     weightKg: 23.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 15-in sub. 1200 W peak. Popular in African and HoW markets. Values from authorized dealer listings — verify with fbt.it.',
     sourceUrl: null,
@@ -1228,6 +1296,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '35 Hz – 150 Hz',
     weightKg: 34.0,
+    impedanceOhm: null,
     notes:
       'Self-powered 18-in touring sub. 2000 W peak. Designed to match FBT HiMaxX line array systems. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1246,6 +1315,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 22.0,
+    impedanceOhm: null,
     notes:
       'Passive 2-way wedge stage monitor. Requires d&b D40 or D80 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1264,6 +1334,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: null,
     freqResponse: '57 Hz – 17 kHz',
     weightKg: 38.0,
+    impedanceOhm: null,
     notes:
       'Passive 2×12 + 1.4-in compression driver. Dual 12-in front-loaded LF. Requires d&b D80. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1282,6 +1353,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '55 Hz – 20 kHz',
     weightKg: 20.0,
+    impedanceOhm: null,
     notes:
       'Passive 2-way wedge. Used as floor wedge with LA4X or LA8. Can also serve as top fill or front fill. Sensitivity = 104 dB/W/m. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1300,6 +1372,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '60 Hz – 18 kHz',
     weightKg: 27.0,
+    impedanceOhm: null,
     notes: 'Self-powered 2-way wedge floor monitor. 1800 W peak. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1317,6 +1390,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 100,
     freqResponse: '80 Hz – 16 kHz',
     weightKg: 9.98,
+    impedanceOhm: null,
     notes:
       'Self-powered compact wide-coverage monitor. 650 W peak. H 100° × V 100°. Used for side-fill or nearfield monitoring.',
     sourceUrl: null,
@@ -1335,6 +1409,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 90,
     freqResponse: '60 Hz – 16 kHz',
     weightKg: 12.4,
+    impedanceOhm: null,
     notes:
       'Passive 2-way wedge floor monitor. 12-in + 2-in compression driver. H 40° × V 90°. Power = program (350 W); peak = 700 W. Sensitivity = 97 dB/W/m.',
     sourceUrl: null,
@@ -1353,6 +1428,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 40,
     freqResponse: '65 Hz – 18 kHz',
     weightKg: 10.5,
+    impedanceOhm: null,
     notes:
       'Passive 2-way front fill. Wide H coverage for stage-edge deployment. Requires d&b D20 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1371,6 +1447,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '100 Hz – 17 kHz',
     weightKg: 5.5,
+    impedanceOhm: null,
     notes:
       'Self-powered compact front fill. 500 W peak. Slim form factor for stage lip mounting. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1389,6 +1466,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '70 Hz – 18 kHz',
     weightKg: 7.5,
+    impedanceOhm: null,
     notes: 'Passive 2-way compact install/delay. Requires d&b D20 amplifier. maxSplAt1m = peak.',
     sourceUrl: null,
     verified: false,
@@ -1406,6 +1484,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 80,
     freqResponse: '80 Hz – 18 kHz',
     weightKg: 3.5,
+    impedanceOhm: null,
     notes:
       'Passive 2-way ultra-compact install speaker. Requires d&b D20 amplifier. Used for under-balcony delay or in-ceiling fill. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1424,6 +1503,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 90,
     freqResponse: '110 Hz – 17 kHz',
     weightKg: 2.5,
+    impedanceOhm: null,
     notes:
       'Self-powered micro install speaker. 300 W peak. Used for near-field fill or under-balcony delay. maxSplAt1m = peak.',
     sourceUrl: null,
@@ -1442,6 +1522,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 160,
     freqResponse: '80 Hz – 16 kHz',
     weightKg: 2.3,
+    impedanceOhm: null,
     notes:
       'Passive 2-way ultra-wide coverage install speaker. 6.5-in LF. Sensitivity = 91 dB/W/m. Power = AES continuous; program = 200 W. Popular for under-balcony delay, HoW pew-back fill.',
     sourceUrl: null,
@@ -1460,6 +1541,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 60,
     freqResponse: '65 Hz – 20 kHz',
     weightKg: 14.5,
+    impedanceOhm: null,
     notes:
       'Self-powered 2-way compact. Suitable for delay fill or small PA. Specs from authorized distributor listings — verify with fbt.it.',
     sourceUrl: null,
@@ -1478,6 +1560,7 @@ export const SPEAKER_DATA: Speaker[] = [
     vCoverage: 15,
     freqResponse: '80 Hz – 18 kHz',
     weightKg: 9.5,
+    impedanceOhm: null,
     notes:
       'Self-powered column array. 4×6.5-in drivers + HF. H 120°, V 15°. Popular for HoW, banquet halls, reverberant spaces. 700 W peak. maxSplAt1m = peak.',
     sourceUrl: null,

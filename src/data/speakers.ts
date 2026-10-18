@@ -27,6 +27,8 @@ export interface Speaker {
   vCoverage: number | null
   freqResponse: string | null
   weightKg: number | null
+  /** Nominal impedance, Ω (passive speakers). */
+  impedanceOhm: number | null
   notes: string | null
   /** Official datasheet the values came from. */
   sourceUrl: string | null

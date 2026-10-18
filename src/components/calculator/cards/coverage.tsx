@@ -8,11 +8,11 @@ import {
 import { fmtDb, fmtDbSigned, fmtDistance, fmtMs, formatNumber } from '../../../calculators/format'
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
 import { useUnits } from '../../../hooks/useUnits'
-import { getSplAt1m } from '../../../data/speakers'
-import { CalcCard, Inputs, Optional, Outputs } from '../CalcCard'
+import { findSpeaker, getSplAt1m, type Speaker, speakerName } from '../../../data/speakers'
+import { CalcCard, Inputs, Outputs } from '../CalcCard'
 import { NumberField, TemperatureField } from '../fields'
 import { SpeakerSelect } from '../SpeakerPicker'
-import { CalcError, Output, Rating, Verdict, Warnings } from '../outputs'
+import { CalcError, Check, Output, Rating, Verdict, Warnings } from '../outputs'
 import { useQ, useTemperature, v } from './shared'
 
 const fmtDeg = (x: number) => formatNumber(x, 1)
@@ -20,6 +20,49 @@ const fmtDeg = (x: number) => formatNumber(x, 1)
 const STANDARD_PATTERNS = [40, 50, 60, 75, 90, 100, 110, 120, 140]
 /** The smallest common horn pattern that covers the required angle. */
 const nextStandard = (deg: number) => STANDARD_PATTERNS.find((p) => p >= deg - 0.5)
+
+/** Does the chosen speaker's published pattern cover the angle the audience needs? */
+function PatternCheck({
+  speaker,
+  axis,
+  needed,
+}: {
+  speaker: Speaker
+  axis: 'h' | 'v'
+  needed: number
+}) {
+  const name = speakerName(speaker)
+  const have = axis === 'h' ? speaker.hCoverage : speaker.vCoverage
+  const plane = axis === 'h' ? 'horizontal' : 'vertical'
+  if (have === null)
+    return (
+      <Check state="warn">
+        {name} has no published {plane} coverage
+        {axis === 'v' && speaker.category === 'line_array_element'
+          ? ' — a line array’s vertical coverage comes from the splay angles between boxes.'
+          : '.'}
+      </Check>
+    )
+  if (have < needed - 0.5)
+    return (
+      <Check state="fail">
+        {name} covers {have}° {plane} — {fmtDeg(needed - have)}° short of the {fmtDeg(needed)}°
+        needed. Use a wider pattern or add a fill.
+      </Check>
+    )
+  if (have > needed * 1.5)
+    return (
+      <Check state="warn">
+        {name} covers {have}° {plane}, much wider than the {fmtDeg(needed)}° needed — expect spill
+        onto walls or ceiling.
+      </Check>
+    )
+  return (
+    <Check state="pass">
+      {name} covers {have}° {plane}, enough for the {fmtDeg(needed)}° needed.
+    </Check>
+  )
+}
 
 export function InverseSquareCard() {
   const id = 'coverage.inverseSquare'
@@ -228,7 +271,9 @@ export function CoverageAngleCard() {
   const [inp, set] = useCalcInputs(id, {
     width: 20 as number | null,
     distance: 12 as number | null,
+    speaker: null as string | null,
   })
+  const chosen = findSpeaker(inp.speaker)
   const q = useQ()
   const r = requiredCoverageAngle(inp.width, inp.distance)
   usePublishResult(
@@ -251,6 +296,12 @@ export function CoverageAngleCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          label="Check a speaker"
+          speakerId={inp.speaker}
+          onClear={() => set('speaker', null)}
+          onSelect={(sp) => set('speaker', sp.id)}
+        />
         <NumberField
           label="Audience width"
           hint="How wide the seating area is at the throw distance."
@@ -283,6 +334,7 @@ export function CoverageAngleCard() {
             . A narrower speaker leaves the edge seats short; a much wider one throws sound onto the
             side walls.
           </Verdict>
+          {chosen && <PatternCheck speaker={chosen} axis="h" needed={r.value} />}
         </Outputs>
       ) : (
         <CalcError message={r.error} />
@@ -297,7 +349,9 @@ export function AsymmetricCoverageCard() {
     near: 4 as number | null,
     far: 35 as number | null,
     height: 7 as number | null,
+    speaker: null as string | null,
   })
+  const chosen = findSpeaker(inp.speaker)
   const q = useQ()
   const { show, label } = useUnits()
   const r = asymmetricCoverage(inp.near, inp.far, inp.height)
@@ -322,6 +376,12 @@ export function AsymmetricCoverageCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          label="Check a speaker"
+          speakerId={inp.speaker}
+          onClear={() => set('speaker', null)}
+          onSelect={(sp) => set('speaker', sp.id)}
+        />
         <NumberField
           label="Near edge distance"
           hint="Horizontal distance from the array to the front row."
@@ -359,6 +419,7 @@ export function AsymmetricCoverageCard() {
             help="Points at the front row."
           />
           <Verdict>{r.value.description}</Verdict>
+          {chosen && <PatternCheck speaker={chosen} axis="v" needed={r.value.totalCoverage} />}
           <Output
             label="Vertical angle to cover"
             value={fmtDeg(r.value.totalCoverage)}
@@ -432,6 +493,26 @@ export function NeedDelaysCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          label="Pick the main speaker"
+          speakerId={inp.mainSpeaker}
+          initialCategory="line_array"
+          onClear={() => {
+            set('mainSpeaker', null)
+            set('mainSpl1m', null)
+          }}
+          onSelect={(s) => {
+            set('mainSpeaker', s.id)
+            set('mainSpl1m', getSplAt1m(s))
+          }}
+        />
+        <NumberField
+          label="Main max SPL at 1 m"
+          unit="dB"
+          value={inp.mainSpl1m}
+          onChange={(x) => set('mainSpl1m', x)}
+          hint="Filled when you pick a speaker. Leave blank to assume both speakers are the same."
+        />
         <NumberField
           label="Main speaker height"
           hint="Height of the main PA above the floor."
@@ -445,6 +526,26 @@ export function NeedDelaysCard() {
           kind="distance"
           value={inp.mainDistance}
           onChange={(x) => set('mainDistance', x)}
+        />
+        <SpeakerSelect
+          label="Pick the delay speaker"
+          speakerId={inp.delaySpeaker}
+          initialCategory="point_source"
+          onClear={() => {
+            set('delaySpeaker', null)
+            set('delaySpl1m', null)
+          }}
+          onSelect={(s) => {
+            set('delaySpeaker', s.id)
+            set('delaySpl1m', getSplAt1m(s))
+          }}
+        />
+        <NumberField
+          label="Delay max SPL at 1 m"
+          unit="dB"
+          value={inp.delaySpl1m}
+          onChange={(x) => set('delaySpl1m', x)}
+          hint="Filled when you pick a speaker."
         />
         <NumberField
           label="Delay speaker height"
@@ -468,50 +569,6 @@ export function NeedDelaysCard() {
           onChange={(x) => set('earHeight', x)}
         />
         <TemperatureField />
-        <Optional
-          title="Compare the actual speakers"
-          active={inp.mainSpl1m !== null || inp.delaySpl1m !== null}
-        >
-          <SpeakerSelect
-            label="Pick the main speaker"
-            speakerId={inp.mainSpeaker}
-            initialCategory="line_array"
-            onClear={() => {
-              set('mainSpeaker', null)
-              set('mainSpl1m', null)
-            }}
-            onSelect={(s) => {
-              set('mainSpeaker', s.id)
-              set('mainSpl1m', getSplAt1m(s))
-            }}
-          />
-          <NumberField
-            label="Main max SPL at 1 m"
-            unit="dB"
-            value={inp.mainSpl1m}
-            onChange={(x) => set('mainSpl1m', x)}
-            hint="From the spec sheet. Leave blank to assume both speakers are the same."
-          />
-          <SpeakerSelect
-            label="Pick the delay speaker"
-            speakerId={inp.delaySpeaker}
-            initialCategory="point_source"
-            onClear={() => {
-              set('delaySpeaker', null)
-              set('delaySpl1m', null)
-            }}
-            onSelect={(s) => {
-              set('delaySpeaker', s.id)
-              set('delaySpl1m', getSplAt1m(s))
-            }}
-          />
-          <NumberField
-            label="Delay max SPL at 1 m"
-            unit="dB"
-            value={inp.delaySpl1m}
-            onChange={(x) => set('delaySpl1m', x)}
-          />
-        </Optional>
       </Inputs>
       {r.ok ? (
         <>

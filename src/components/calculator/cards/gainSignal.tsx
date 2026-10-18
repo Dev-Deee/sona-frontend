@@ -328,6 +328,7 @@ export function GainStructureCard() {
     speakerSensitivity: 98 as number | null,
     impedance: 8 as number | null,
     distance: 15 as number | null,
+    speaker: null as string | null,
   })
   const q = useQ()
   const r = gainStructure({
@@ -400,6 +401,17 @@ export function GainStructureCard() {
           unit="dB"
           value={inp.ampGain}
           onChange={(x) => set('ampGain', x)}
+        />
+        <SpeakerSelect
+          label="Pick the speaker"
+          speakerId={inp.speaker}
+          initialType="passive"
+          onClear={() => set('speaker', null)}
+          onSelect={(sp) => {
+            set('speaker', sp.id)
+            if (sp.sensitivity !== null) set('speakerSensitivity', sp.sensitivity)
+            if (sp.impedanceOhm !== null) set('impedance', sp.impedanceOhm)
+          }}
         />
         <NumberField
           label="Speaker sensitivity"

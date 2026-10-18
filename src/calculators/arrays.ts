@@ -50,6 +50,76 @@ export function combFilter(
   )
 }
 
+export type CombSeverity = 'severe' | 'noticeable' | 'mild'
+
+export interface SpeakerComb extends CombFilter {
+  /** Speaker A → listener and speaker B → listener. */
+  pathA: number
+  pathB: number
+  /** Level of B relative to A at the listener (distance + speaker difference), dB. */
+  levelDifferenceDb: number
+  /** Peak-to-notch ripple of the comb, dB (∞ when both arrive equally loud). */
+  depthDb: number
+  /** Boost at the frequencies where the arrivals add, dB. */
+  peakDb: number
+  severity: CombSeverity
+  /** Which speaker arrives first at this seat. */
+  earlier: 'A' | 'B'
+}
+
+/**
+ * Two speakers side by side, `spacingM` apart, playing the same signal. The listener sits
+ * `distanceM` in front of the midpoint and `offsetM` towards speaker B (negative: towards A).
+ * Optional max SPL at 1 m per speaker; without both, identical speakers are assumed.
+ */
+export function speakerCombFilter(input: {
+  spacingM: number | null | undefined
+  distanceM: number | null | undefined
+  offsetM: number | null | undefined
+  temperatureC: number | null | undefined
+  splA?: number | null
+  splB?: number | null
+}): CalcResult<SpeakerComb> {
+  const err = firstError(
+    requirePositive(input.spacingM, 'speaker spacing'),
+    requirePositive(input.distanceM, 'listener distance'),
+    requireNumber(input.offsetM, 'listener offset'),
+  )
+  if (err) return fail(err)
+  const half = (input.spacingM as number) / 2
+  const d = input.distanceM as number
+  const x = input.offsetM as number
+  const pathA = Math.hypot(x + half, d)
+  const pathB = Math.hypot(x - half, d)
+  const delta = Math.abs(pathA - pathB)
+  if (delta < 1e-6)
+    return fail('The listener is equally far from both speakers — no comb filtering here')
+  const s = speedOrFail(input.temperatureC)
+  if ('error' in s) return fail(s.error)
+  const specDiff = isNum(input.splA) && isNum(input.splB) ? input.splB - input.splA : 0
+  const levelDifferenceDb = 20 * Math.log10(pathA / pathB) + specDiff
+  const ratio = 10 ** (-Math.abs(levelDifferenceDb) / 20)
+  const depthDb = ratio >= 1 ? Infinity : 20 * Math.log10((1 + ratio) / (1 - ratio))
+  const abs = Math.abs(levelDifferenceDb)
+  return ok(
+    {
+      pathDifference: delta,
+      timeOffsetMs: (delta / s.c) * 1000,
+      firstNotchHz: s.c / (2 * delta),
+      notchSpacingHz: s.c / delta,
+      halfWavelength: delta,
+      pathA,
+      pathB,
+      levelDifferenceDb,
+      depthDb,
+      peakDb: 20 * Math.log10(1 + ratio),
+      severity: abs < 4 ? 'severe' : abs < 10 ? 'noticeable' : 'mild',
+      earlier: pathA <= pathB ? 'A' : 'B',
+    },
+    s.warnings,
+  )
+}
+
 export interface ConstantCurvature {
   arcLength: number
   /** Angle between the top and bottom box axes: (N − 1)·splay. */
