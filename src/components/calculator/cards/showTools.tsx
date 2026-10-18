@@ -13,7 +13,9 @@ import type { InputValue } from '../../../store/inputsStore'
 import { Button } from '../../ui/Button'
 import { Icon } from '../../ui/icons'
 import { CalcCard, Inputs, Outputs } from '../CalcCard'
+import { findSpeaker } from '../../../data/speakers'
 import { NumberField, Segmented, SelectField, TextField } from '../fields'
+import { SpeakerSelect } from '../SpeakerPicker'
 import { CalcError, Output, Rating, Verdict, Warnings } from '../outputs'
 import { downloadCsv } from './download'
 import { useQ, v } from './shared'
@@ -164,7 +166,11 @@ export function RiggingLoadCard() {
     angle: 15 as number | null,
     factor: 10 as number,
     hoist: 1000 as number,
+    speaker: null as string | null,
+    boxes: 12 as number | null,
   })
+  const box = findSpeaker(inp.speaker)
+  const boxKg = box?.weightKg ?? null
   const q = useQ()
   const { show, label } = useUnits()
   const r = riggingLoad({
@@ -196,6 +202,27 @@ export function RiggingLoadCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          label="Pick the box you’re hanging"
+          speakerId={inp.speaker}
+          initialCategory="line_array"
+          onClear={() => set('speaker', null)}
+          onSelect={(s) => {
+            set('speaker', s.id)
+            if (s.weightKg !== null && inp.boxes !== null) set('weight', s.weightKg * inp.boxes)
+          }}
+        />
+        {boxKg !== null && (
+          <NumberField
+            label="Boxes in the hang"
+            hint={`${formatNumber(boxKg, 1)} kg each. Add the frame and cable weight to the total below.`}
+            value={inp.boxes}
+            onChange={(x) => {
+              set('boxes', x)
+              if (x !== null) set('weight', boxKg * x)
+            }}
+          />
+        )}
         <NumberField
           label="Array weight"
           hint="Total weight of the boxes, frame and cabling."

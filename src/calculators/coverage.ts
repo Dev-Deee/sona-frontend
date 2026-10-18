@@ -234,6 +234,9 @@ export interface DelayPlanInput {
   delayCoverageHDeg: number | null | undefined
   delayCoverageVDeg: number | null | undefined
   delayHeightM: number | null | undefined
+  /** Delay speaker: spec-sheet max SPL, or sensitivity + amplifier power (default). */
+  delayMode?: ActiveMode
+  delayMaxSpl?: number | null
   delaySensitivity: number | null | undefined
   delayPowerW: number | null | undefined
   // Stage 5
@@ -427,8 +430,12 @@ export function planDelayTowers(input: DelayPlanInput): CalcResult<DelayPlan> {
     requirePositive(input.delayCoverageHDeg, 'delay speaker horizontal coverage'),
     requirePositive(input.delayCoverageVDeg, 'delay speaker vertical coverage'),
     requireNonNegative(input.delayHeightM, 'delay speaker height'),
-    requireNumber(input.delaySensitivity, 'delay speaker sensitivity'),
-    requirePositive(input.delayPowerW, 'amplifier power to the delay'),
+    ...(input.delayMode === 'maxSpl'
+      ? [requireNumber(input.delayMaxSpl, 'delay speaker max SPL at 1 m')]
+      : [
+          requireNumber(input.delaySensitivity, 'delay speaker sensitivity'),
+          requirePositive(input.delayPowerW, 'amplifier power to the delay'),
+        ]),
   )
   if (!placement.ok) speaker = fail(placement.error)
   else if (!placement.value.needed)
@@ -440,7 +447,10 @@ export function planDelayTowers(input: DelayPlanInput): CalcResult<DelayPlan> {
     const throwToBack = depth - placement.value.fromFront
     const vDrop = (input.delayHeightM as number) - ear
     const totalDelayThrow = Math.hypot(throwToBack, vDrop)
-    const spl1m = (input.delaySensitivity as number) + 10 * Math.log10(input.delayPowerW as number)
+    const spl1m =
+      input.delayMode === 'maxSpl'
+        ? (input.delayMaxSpl as number)
+        : (input.delaySensitivity as number) + 10 * Math.log10(input.delayPowerW as number)
     const splBack = spl1m - 20 * Math.log10(Math.max(totalDelayThrow, MIN_DISTANCE))
     const matchDb = splBack - (mains as { value: MainsStage }).value.splFront
     const aimAngle = deg(Math.atan2(vDrop, throwToBack))
