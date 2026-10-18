@@ -12,6 +12,7 @@ import {
   constantCurvature,
   inlineSubArray,
   maxSubSpacing,
+  speakerCombFilter,
   subArraySettings,
   uncoupledSpacing,
 } from '../arrays'
@@ -73,6 +74,43 @@ describe('asymmetricCoverage', () => {
   it('requires far > near', () => {
     expect(error(asymmetricCoverage(20, 10, 5))).toMatch(/further/)
     expect(asymmetricCoverage(0, 10, 5).ok).toBe(false)
+  })
+})
+
+describe('speakerCombFilter', () => {
+  const base = { spacingM: 4, distanceM: 10, temperatureC: 20 }
+  it('finds path difference, notches and ripple for identical speakers', () => {
+    const r = value(speakerCombFilter({ ...base, offsetM: 3 }))
+    expect(r.pathA).toBeCloseTo(Math.hypot(5, 10), 10)
+    expect(r.pathB).toBeCloseTo(Math.hypot(1, 10), 10)
+    expect(r.earlier).toBe('B')
+    expect(r.firstNotchHz).toBeCloseTo(c20() / (2 * (r.pathA - r.pathB)), 8)
+    expect(r.levelDifferenceDb).toBeCloseTo(20 * Math.log10(r.pathA / r.pathB), 10)
+    const ratio = 10 ** (-r.levelDifferenceDb / 20)
+    expect(r.depthDb).toBeCloseTo(20 * Math.log10((1 + ratio) / (1 - ratio)), 10)
+    expect(r.severity).toBe('severe')
+  })
+  it('accounts for different speakers and rates severity', () => {
+    const louderA = value(speakerCombFilter({ ...base, offsetM: 3, splA: 142, splB: 132 }))
+    expect(louderA.severity).toBe('noticeable')
+    expect(louderA.levelDifferenceDb).toBeLessThan(0)
+    expect(value(speakerCombFilter({ ...base, offsetM: 3, splA: 142, splB: 120 })).severity).toBe(
+      'mild',
+    )
+    const near = value(speakerCombFilter({ ...base, offsetM: -0.2 }))
+    expect(near.earlier).toBe('A')
+    expect(near.severity).toBe('severe')
+    // Far off to one side, the nearer speaker dominates.
+    const side = value(
+      speakerCombFilter({ spacingM: 10, distanceM: 2, offsetM: 5, temperatureC: 20 }),
+    )
+    expect(side.severity).toBe('mild')
+  })
+  it('rejects bad input and the dead-centre seat', () => {
+    expect(speakerCombFilter({ ...base, offsetM: 0 }).ok).toBe(false)
+    expect(speakerCombFilter({ ...base, spacingM: 0, offsetM: 1 }).ok).toBe(false)
+    expect(speakerCombFilter({ ...base, offsetM: null }).ok).toBe(false)
+    expect(speakerCombFilter({ ...base, offsetM: 1, temperatureC: null }).ok).toBe(false)
   })
 })
 

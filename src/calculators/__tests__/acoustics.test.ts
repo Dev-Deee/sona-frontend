@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   criticalDistance,
+  directivityQ,
   frequencyToWavelength,
   itdg,
   roomModes,
@@ -160,5 +161,19 @@ describe('itdg', () => {
   it('rejects zero distance', () => {
     expect(itdg(0, 20).ok).toBe(false)
     expect(itdg(5, null).ok).toBe(false)
+  })
+})
+
+describe('directivityQ', () => {
+  it('estimates Q from H × V coverage (Molloy)', () => {
+    expect(value(directivityQ(90, 60))).toBeCloseTo(
+      180 / ((Math.asin(Math.SQRT1_2 * 0.5) * 180) / Math.PI),
+      10,
+    )
+    expect(value(directivityQ(180, 180))).toBeCloseTo(2, 10)
+  })
+  it('rejects missing or impossible angles', () => {
+    expect(error(directivityQ(null, 60))).toMatch(/horizontal coverage/)
+    expect(error(directivityQ(200, 60))).toMatch(/180°/)
   })
 })

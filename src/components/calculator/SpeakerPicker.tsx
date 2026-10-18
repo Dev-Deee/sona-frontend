@@ -70,15 +70,17 @@ export function SpeakerPickerModal({
   onClose,
   onSelect,
   initialCategory = 'all',
+  initialType = 'all',
 }: {
   open: boolean
   onClose: () => void
   onSelect: (speaker: Speaker) => void
   initialCategory?: CategoryFilter
+  initialType?: SpeakerType | 'all'
 }) {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<CategoryFilter>(initialCategory)
-  const [type, setType] = useState<SpeakerType | 'all'>('all')
+  const [type, setType] = useState<SpeakerType | 'all'>(initialType)
   const deferred = useDeferredValue(query)
   const titleId = useId()
   const searchRef = useRef<HTMLInputElement>(null)
@@ -244,12 +246,14 @@ export function SpeakerSelect({
   onSelect,
   onClear,
   initialCategory,
+  initialType,
 }: {
   label?: string
   speakerId: string | null
   onSelect: (speaker: Speaker) => void
   onClear: () => void
   initialCategory?: CategoryFilter
+  initialType?: SpeakerType | 'all'
 }) {
   const [open, setOpen] = useState(false)
   // A fresh picker per opening, so search and filters start from this calculator's defaults.
@@ -290,6 +294,7 @@ export function SpeakerSelect({
         open={open}
         onClose={() => setOpen(false)}
         initialCategory={initialCategory}
+        initialType={initialType}
         onSelect={(s) => {
           setOpen(false)
           onSelect(s)

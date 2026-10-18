@@ -1,5 +1,6 @@
 import {
   criticalDistance,
+  directivityQ,
   frequencyToWavelength,
   itdg,
   roomModes,
@@ -10,7 +11,8 @@ import {
 import { fmtDistance, fmtHz, fmtMs, formatNumber, PRECISION } from '../../../calculators/format'
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
 import { useUnits } from '../../../hooks/useUnits'
-import { CalcCard, Inputs, Outputs } from '../CalcCard'
+import { CalcCard, Inputs, Optional, Outputs } from '../CalcCard'
+import { SpeakerSelect } from '../SpeakerPicker'
 import { NumberField, Segmented, TemperatureField } from '../fields'
 import {
   CalcError,
@@ -323,10 +325,15 @@ export function CriticalDistanceCard({
   const [inp, set] = useCalcInputs(calcId, {
     volume: 5000 as number | null,
     rt60: 1.8 as number | null,
+    speaker: null as string | null,
+    hCoverage: null as number | null,
+    vCoverage: null as number | null,
   })
   const q = useQ()
   const { show, label } = useUnits()
   const r = criticalDistance(inp.volume, inp.rt60)
+  const directional = inp.hCoverage !== null || inp.vCoverage !== null
+  const dq = directivityQ(inp.hCoverage, inp.vCoverage)
   usePublishResult(
     calcId,
     r.ok
@@ -361,11 +368,51 @@ export function CriticalDistanceCard({
           value={inp.rt60}
           onChange={(x) => set('rt60', x)}
         />
+        <Optional title="Your speaker’s directivity" active={directional}>
+          <SpeakerSelect
+            speakerId={inp.speaker}
+            onClear={() => {
+              set('speaker', null)
+              set('hCoverage', null)
+              set('vCoverage', null)
+            }}
+            onSelect={(s) => {
+              set('speaker', s.id)
+              set('hCoverage', s.hCoverage)
+              set('vCoverage', s.vCoverage)
+            }}
+          />
+          <NumberField
+            label="Horizontal coverage"
+            unit="°"
+            value={inp.hCoverage}
+            onChange={(x) => set('hCoverage', x)}
+            hint="From the spec sheet."
+          />
+          <NumberField
+            label="Vertical coverage"
+            unit="°"
+            value={inp.vCoverage}
+            onChange={(x) => set('vCoverage', x)}
+            hint="Line arrays don’t publish one — it depends on the splay."
+          />
+        </Optional>
       </Inputs>
       {r.ok ? (
         <Outputs>
+          {directional && dq.ok && (
+            <Output
+              label="Critical distance with your speaker"
+              help={`Q ≈ ${formatNumber(dq.value, 1)} from its ${inp.hCoverage}° × ${inp.vCoverage}° pattern, so Dc stretches by √Q.`}
+              value={fmtDistance(show('distance', r.value * Math.sqrt(dq.value)))}
+              unit={label('distance')}
+              wide
+            />
+          )}
+          {directional && !dq.ok && <CalcError message={`Directivity: ${dq.error}`} />}
           <Output
-            label="Critical distance"
+            label={directional ? 'Critical distance (omni source)' : 'Critical distance'}
+            secondary={directional && dq.ok}
             help="The distance where the speaker’s direct sound and the room’s reverb are equally loud."
             value={fmtDistance(show('distance', r.value))}
             unit={label('distance')}

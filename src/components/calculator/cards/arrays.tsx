@@ -4,9 +4,14 @@ import {
   constantCurvature,
   inlineSubArray,
   maxSubSpacing,
+  speakerCombFilter,
   uncoupledSpacing,
+  type CombSeverity,
+  type SpeakerComb,
   type SubArrayMode,
 } from '../../../calculators/arrays'
+import { getSplAt1m } from '../../../data/speakers'
+import { SpeakerSelect } from '../SpeakerPicker'
 import {
   fmtDb,
   fmtDbSigned,
@@ -28,50 +33,170 @@ const fmtDeg = (x: number) => formatNumber(x, 1)
 const capDb = (x: number, signed = false) =>
   Math.abs(x) > 60 ? `${x < 0 ? '< −' : '> '}60` : signed ? fmtDbSigned(x) : fmtDb(x)
 
+const SEVERITY: Record<CombSeverity, { label: string; tone: Tone; advice: string }> = {
+  severe: {
+    label: 'Strong comb filtering',
+    tone: 'bad',
+    advice:
+      'Both speakers reach this seat at almost the same level, so the cancellations are deep. Narrow the overlap (aim them apart, use narrower patterns), move them closer together, or turn one down here.',
+  },
+  noticeable: {
+    label: 'Noticeable',
+    tone: 'warn',
+    advice:
+      'One speaker is louder, which softens the notches, but they are still audible. Aim to keep one speaker at least 10 dB louder than the other in its own area.',
+  },
+  mild: {
+    label: 'Mild',
+    tone: 'good',
+    advice:
+      'One speaker dominates this seat by 10 dB or more, so the ripple is small. This is the goal for overlap zones.',
+  },
+}
+
 export function CombFilterCard() {
   const id = 'arrays.comb'
   const [inp, set] = useCalcInputs(id, {
+    mode: 'speakers' as 'speakers' | 'paths',
     direct: 10 as number | null,
     reflected: 11.5 as number | null,
+    spacing: 4 as number | null,
+    distance: 10 as number | null,
+    offset: 3 as number | null,
+    speakerA: null as string | null,
+    speakerB: null as string | null,
+    splA: null as number | null,
+    splB: null as number | null,
   })
   const q = useQ()
   const { temperatureC, temperatureText } = useTemperature()
   const { show, label } = useUnits()
-  const r = combFilter(inp.direct, inp.reflected, temperatureC)
+  const speakers = inp.mode === 'speakers'
+  const r = speakers
+    ? speakerCombFilter({
+        spacingM: inp.spacing,
+        distanceM: inp.distance,
+        offsetM: inp.offset,
+        temperatureC,
+        splA: inp.splA,
+        splB: inp.splB,
+      })
+    : combFilter(inp.direct, inp.reflected, temperatureC)
+  const sp = speakers && r.ok ? (r.value as SpeakerComb) : null
   usePublishResult(
     id,
     r.ok
       ? {
           title: 'Comb Filter',
-          inputs: `${q('distance', inp.direct)} vs ${q('distance', inp.reflected)} @ ${temperatureText}`,
+          inputs: speakers
+            ? `2 speakers ${q('distance', inp.spacing)} apart, listener ${q('distance', inp.distance)} out, ${q('distance', inp.offset)} off centre @ ${temperatureText}`
+            : `${q('distance', inp.direct)} vs ${q('distance', inp.reflected)} @ ${temperatureText}`,
           output: `first notch ${fmtHz(r.value.firstNotchHz)} Hz`,
         }
       : null,
   )
+  const dist = (m: number) => `${fmtDistance(show('distance', m))} ${label('distance')}`
   return (
     <CalcCard
       title="Comb Filter"
       info={{
-        what: 'Frequency of the first cancellation (and spacing of the rest) when two copies of a signal arrive with a path difference.',
-        when: 'Diagnosing a hollow sound from a floor/wall reflection, two mics on one source, or overlapping speakers.',
-        formula: 'Δ = |reflected − direct|\nf_notch = c / (2Δ), spacing = c / Δ',
+        what: 'Where sound cancels when two copies of a signal arrive at different times — from two speakers covering the same seat, or a reflection.',
+        when: 'Diagnosing a hollow sound from overlapping speakers, a floor/wall reflection, or two mics on one source.',
+        formula:
+          'Δ = |path B − path A|\nf_notch = c / (2Δ), spacing = c / Δ\nΔL = 20·log₁₀(path A / path B) + (SPL B − SPL A)\nripple = 20·log₁₀((1 + r) / (1 − r)), r = 10^(−|ΔL|/20)',
       }}
     >
       <Inputs>
-        <NumberField
-          label="Direct path"
-          hint="Distance sound travels straight from the source to the listener (or mic)."
-          kind="distance"
-          value={inp.direct}
-          onChange={(x) => set('direct', x)}
+        <Segmented
+          label="What overlaps?"
+          value={inp.mode}
+          onChange={(m) => set('mode', m)}
+          options={[
+            { value: 'speakers', label: 'Two speakers' },
+            { value: 'paths', label: 'A reflection / two paths' },
+          ]}
         />
-        <NumberField
-          label="Reflected / secondary path"
-          hint="Distance via the reflection (floor, wall) or the second speaker/mic."
-          kind="distance"
-          value={inp.reflected}
-          onChange={(x) => set('reflected', x)}
-        />
+        {speakers ? (
+          <>
+            <SpeakerSelect
+              label="Pick speaker A"
+              speakerId={inp.speakerA}
+              onClear={() => {
+                set('speakerA', null)
+                set('splA', null)
+              }}
+              onSelect={(s) => {
+                set('speakerA', s.id)
+                set('splA', getSplAt1m(s))
+              }}
+            />
+            <SpeakerSelect
+              label="Pick speaker B"
+              speakerId={inp.speakerB}
+              onClear={() => {
+                set('speakerB', null)
+                set('splB', null)
+              }}
+              onSelect={(s) => {
+                set('speakerB', s.id)
+                set('splB', getSplAt1m(s))
+              }}
+            />
+            <NumberField
+              label="Distance between the speakers"
+              hint="Centre to centre, side by side (e.g. a main and an out-fill, or two fills)."
+              kind="distance"
+              value={inp.spacing}
+              onChange={(x) => set('spacing', x)}
+            />
+            <NumberField
+              label="Listener distance"
+              hint="How far in front of the speakers the seat is."
+              kind="distance"
+              value={inp.distance}
+              onChange={(x) => set('distance', x)}
+            />
+            <NumberField
+              label="Listener offset from centre"
+              hint="Sideways from the midpoint, towards speaker B. 0 = dead centre; negative = towards A."
+              kind="distance"
+              value={inp.offset}
+              onChange={(x) => set('offset', x)}
+            />
+            <Optional title="Speaker levels" active={inp.splA !== null || inp.splB !== null}>
+              <NumberField
+                label="Speaker A max SPL at 1 m"
+                unit="dB"
+                value={inp.splA}
+                onChange={(x) => set('splA', x)}
+                hint="Filled when you pick a speaker. Leave both blank for identical speakers."
+              />
+              <NumberField
+                label="Speaker B max SPL at 1 m"
+                unit="dB"
+                value={inp.splB}
+                onChange={(x) => set('splB', x)}
+              />
+            </Optional>
+          </>
+        ) : (
+          <>
+            <NumberField
+              label="Direct path"
+              hint="Distance sound travels straight from the source to the listener (or mic)."
+              kind="distance"
+              value={inp.direct}
+              onChange={(x) => set('direct', x)}
+            />
+            <NumberField
+              label="Reflected / secondary path"
+              hint="Distance via the reflection (floor, wall) or the second speaker/mic."
+              kind="distance"
+              value={inp.reflected}
+              onChange={(x) => set('reflected', x)}
+            />
+          </>
+        )}
         <TemperatureField />
       </Inputs>
       {r.ok ? (
@@ -83,27 +208,73 @@ export function CombFilterCard() {
             unit="Hz"
             wide
           />
-          <Verdict>
-            The second arrival travels {fmtDistance(show('distance', r.value.pathDifference))}{' '}
-            {label('distance')} further ({fmtMs(r.value.timeOffsetMs)} ms later), so sound cancels
-            at {fmtHz(r.value.firstNotchHz)} Hz and again every {fmtHz(r.value.notchSpacingHz)} Hz
-            above it — a hollow, phasey sound. Make the two paths equal, or reduce the level of one,
-            to remove it.
-          </Verdict>
-          <Output
-            label="Gap between cancellations"
-            value={fmtHz(r.value.notchSpacingHz)}
-            unit="Hz"
-            secondary
-            help="The notches repeat at this interval up the spectrum."
-          />
-          <Output
-            label="Time difference"
-            value={fmtMs(r.value.timeOffsetMs)}
-            unit="ms"
-            secondary
-            help="Delaying the earlier arrival by this lines the two up."
-          />
+          {sp ? (
+            <>
+              <Rating
+                label="How bad is it here?"
+                value={SEVERITY[sp.severity].label}
+                tone={SEVERITY[sp.severity].tone}
+              />
+              <Verdict>
+                Speaker {sp.earlier} arrives {fmtMs(sp.timeOffsetMs)} ms first, so sound cancels at{' '}
+                {fmtHz(sp.firstNotchHz)} Hz and every {fmtHz(sp.notchSpacingHz)} Hz above.{' '}
+                {SEVERITY[sp.severity].advice}
+              </Verdict>
+              <Output
+                label="Level difference at the seat"
+                value={fmtDbSigned(sp.levelDifferenceDb)}
+                unit="dB"
+                secondary
+                help="Speaker B compared with speaker A, from distance and the speakers’ max SPL."
+              />
+              <Output
+                label="Ripple (peak to notch)"
+                value={capDb(sp.depthDb)}
+                unit="dB"
+                secondary
+                help={`Peaks rise by up to ${capDb(sp.peakDb)} dB; notches fall the rest of the way.`}
+              />
+              <Output label="Speaker A → listener" value={dist(sp.pathA)} secondary />
+              <Output label="Speaker B → listener" value={dist(sp.pathB)} secondary />
+              <Output
+                label="Time difference"
+                value={fmtMs(sp.timeOffsetMs)}
+                unit="ms"
+                secondary
+                help={`Delaying speaker ${sp.earlier} by this aligns the two at this seat only — other seats will still comb.`}
+              />
+              <Output
+                label="Gap between cancellations"
+                value={fmtHz(sp.notchSpacingHz)}
+                unit="Hz"
+                secondary
+              />
+            </>
+          ) : (
+            <>
+              <Verdict>
+                The second arrival travels {fmtDistance(show('distance', r.value.pathDifference))}{' '}
+                {label('distance')} further ({fmtMs(r.value.timeOffsetMs)} ms later), so sound
+                cancels at {fmtHz(r.value.firstNotchHz)} Hz and again every{' '}
+                {fmtHz(r.value.notchSpacingHz)} Hz above it — a hollow, phasey sound. Make the two
+                paths equal, or reduce the level of one, to remove it.
+              </Verdict>
+              <Output
+                label="Gap between cancellations"
+                value={fmtHz(r.value.notchSpacingHz)}
+                unit="Hz"
+                secondary
+                help="The notches repeat at this interval up the spectrum."
+              />
+              <Output
+                label="Time difference"
+                value={fmtMs(r.value.timeOffsetMs)}
+                unit="ms"
+                secondary
+                help="Delaying the earlier arrival by this lines the two up."
+              />
+            </>
+          )}
         </Outputs>
       ) : (
         <CalcError message={r.error} />
@@ -534,7 +705,11 @@ export function MaxSubSpacingCard() {
 
 export function UncoupledSpacingCard() {
   const id = 'arrays.uncoupled'
-  const [inp, set] = useCalcInputs(id, { angle: 90 as number | null, height: 1.5 as number | null })
+  const [inp, set] = useCalcInputs(id, {
+    angle: 90 as number | null,
+    height: 1.5 as number | null,
+    speaker: null as string | null,
+  })
   const q = useQ()
   const { show, label } = useUnits()
   const r = uncoupledSpacing(inp.angle, inp.height)
@@ -558,6 +733,15 @@ export function UncoupledSpacingCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          speakerId={inp.speaker}
+          initialCategory="fill"
+          onClear={() => set('speaker', null)}
+          onSelect={(sp) => {
+            set('speaker', sp.id)
+            if (sp.hCoverage !== null) set('angle', sp.hCoverage)
+          }}
+        />
         <NumberField
           label="Speaker coverage angle"
           hint="Each speaker’s rated coverage angle, from the spec sheet."
