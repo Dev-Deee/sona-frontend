@@ -16,6 +16,7 @@ import {
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
 import { CalcCard, InputGroup, Inputs, Optional, Outputs } from '../CalcCard'
 import { NumberField, Segmented } from '../fields'
+import { SpeakerSelect } from '../SpeakerPicker'
 import { CalcError, Note, Output, Rating, ResultTable, Verdict, Warnings } from '../outputs'
 import { NumberListEditor } from './ListEditor'
 import { RATING_TONES, useQ, v } from './shared'
@@ -221,6 +222,7 @@ export function SpeakerHeadroomCard() {
     amp: 800 as number | null,
     continuous: 500 as number | null,
     program: 1000 as number | null,
+    speaker: null as string | null,
   })
   const r = speakerHeadroom(inp.amp, inp.continuous, inp.program)
   usePublishResult(
@@ -244,6 +246,18 @@ export function SpeakerHeadroomCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          speakerId={inp.speaker}
+          initialCategory="point_source"
+          onClear={() => set('speaker', null)}
+          onSelect={(s) => {
+            set('speaker', s.id)
+            if (s.ratedPowerW !== null) {
+              set('continuous', s.ratedPowerW)
+              set('program', s.ratedPowerW * 2)
+            }
+          }}
+        />
         <NumberField
           label="Amplifier power"
           hint="Amp output per channel at the speaker’s impedance."

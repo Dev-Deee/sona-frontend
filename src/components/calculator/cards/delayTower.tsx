@@ -20,7 +20,9 @@ import { useUnits } from '../../../hooks/useUnits'
 import { toast } from '../../../store/toastStore'
 import { Button } from '../../ui/Button'
 import { CalcCard } from '../CalcCard'
+import { speakerFill, type Speaker } from '../../../data/speakers'
 import { NumberField, Segmented, TemperatureField } from '../fields'
+import { SpeakerSelect } from '../SpeakerPicker'
 import {
   CalcError,
   Check,
@@ -126,6 +128,10 @@ export function DelayTowerPlannerCard() {
     delayHeight: 5 as number | null,
     delaySensitivity: 98 as number | null,
     delayPower: 1000 as number | null,
+    delayMode: 'sensitivity' as ActiveMode,
+    delayMaxSpl: 130 as number | null,
+    mainSpeaker: null as string | null,
+    delaySpeaker: null as string | null,
     overlap: '0.1' as Overlap,
   })
   const { temperatureC, temperatureText } = useTemperature()
@@ -134,6 +140,27 @@ export function DelayTowerPlannerCard() {
   const rough = (m: number) => formatNumber(show('distance', m), 1)
   const u = label('distance')
   const stage = Math.min(Math.max(inp.stage, 1), 6)
+
+  const pickMain = (sp: Speaker) => {
+    const f = speakerFill(sp)
+    set('mainSpeaker', sp.id)
+    set('speakerType', f.type)
+    if (f.type === 'active') set('activeMode', f.mode)
+    if (f.maxSpl !== null) set('mainMaxSpl', f.maxSpl)
+    if (f.sensitivity !== null) set('mainSensitivity', f.sensitivity)
+    if (f.powerW !== null) set('mainPower', f.powerW)
+    if (f.hCoverage !== null) set('mainCoverage', f.hCoverage)
+  }
+  const pickDelay = (sp: Speaker) => {
+    const f = speakerFill(sp)
+    set('delaySpeaker', sp.id)
+    set('delayMode', f.mode)
+    if (f.maxSpl !== null) set('delayMaxSpl', f.maxSpl)
+    if (f.sensitivity !== null) set('delaySensitivity', f.sensitivity)
+    if (f.powerW !== null) set('delayPower', f.powerW)
+    if (f.hCoverage !== null) set('delayH', f.hCoverage)
+    if (f.vCoverage !== null) set('delayV', f.vCoverage)
+  }
 
   const plan = planDelayTowers({
     venue: inp.venue,
@@ -158,6 +185,8 @@ export function DelayTowerPlannerCard() {
     delayHeightM: inp.delayHeight,
     delaySensitivity: inp.delaySensitivity,
     delayPowerW: inp.delayPower,
+    delayMode: inp.delayMode,
+    delayMaxSpl: inp.delayMaxSpl,
     overlap: Number(inp.overlap),
   })
 
@@ -349,6 +378,13 @@ export function DelayTowerPlannerCard() {
         number={2}
         inputs={
           <>
+            <SpeakerSelect
+              label="Pick your main speaker"
+              speakerId={inp.mainSpeaker}
+              onSelect={pickMain}
+              onClear={() => set('mainSpeaker', null)}
+              initialCategory="line_array"
+            />
             <Segmented
               label="Speaker type"
               value={inp.speakerType}
@@ -553,6 +589,13 @@ export function DelayTowerPlannerCard() {
         number={4}
         inputs={
           <>
+            <SpeakerSelect
+              label="Pick the delay speaker"
+              speakerId={inp.delaySpeaker}
+              onSelect={pickDelay}
+              onClear={() => set('delaySpeaker', null)}
+              initialCategory="point_source"
+            />
             <NumberField
               label="Delay speaker horizontal coverage"
               unit="°"
@@ -574,18 +617,39 @@ export function DelayTowerPlannerCard() {
               onChange={(x) => set('delayHeight', x)}
               hint="Height above the floor where it will be mounted on the tower."
             />
-            <NumberField
-              label="Delay speaker sensitivity"
-              unit="dB/W/m"
-              value={inp.delaySensitivity}
-              onChange={(x) => set('delaySensitivity', x)}
+            <Segmented
+              label="What does your spec sheet give?"
+              value={inp.delayMode}
+              onChange={(x) => set('delayMode', x)}
+              options={[
+                { value: 'sensitivity', label: 'Sensitivity + power' },
+                { value: 'maxSpl', label: 'Max SPL at 1 m' },
+              ]}
             />
-            <NumberField
-              label="Amplifier power to the delay"
-              unit="W"
-              value={inp.delayPower}
-              onChange={(x) => set('delayPower', x)}
-            />
+            {inp.delayMode === 'maxSpl' ? (
+              <NumberField
+                label="Delay speaker max SPL at 1 m"
+                unit="dB"
+                value={inp.delayMaxSpl}
+                onChange={(x) => set('delayMaxSpl', x)}
+                hint="Straight from the spec sheet — usual for active speakers."
+              />
+            ) : (
+              <>
+                <NumberField
+                  label="Delay speaker sensitivity"
+                  unit="dB/W/m"
+                  value={inp.delaySensitivity}
+                  onChange={(x) => set('delaySensitivity', x)}
+                />
+                <NumberField
+                  label="Amplifier power to the delay"
+                  unit="W"
+                  value={inp.delayPower}
+                  onChange={(x) => set('delayPower', x)}
+                />
+              </>
+            )}
           </>
         }
         results={

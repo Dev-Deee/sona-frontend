@@ -15,6 +15,7 @@ import {
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
 import { CalcCard, InputGroup, Inputs, Outputs } from '../CalcCard'
 import { NumberField, Segmented } from '../fields'
+import { SpeakerSelect } from '../SpeakerPicker'
 import {
   CalcError,
   ConstantBadge,
@@ -35,6 +36,7 @@ export function AmpPowerSplCard() {
     targetSpl: 110 as number | null,
     sensitivity: 98 as number | null,
     distance: 20 as number | null,
+    speaker: null as string | null,
   })
   const q = useQ()
   const forward = inp.mode === 'forward'
@@ -62,6 +64,16 @@ export function AmpPowerSplCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          speakerId={inp.speaker}
+          initialCategory="point_source"
+          onClear={() => set('speaker', null)}
+          onSelect={(s) => {
+            set('speaker', s.id)
+            if (s.sensitivity !== null) set('sensitivity', s.sensitivity)
+            if (s.ratedPowerW !== null) set('power', s.ratedPowerW)
+          }}
+        />
         <Segmented
           label="Solve for"
           hint="Find the SPL from your amp, or the amp power you need for a target SPL."
