@@ -86,6 +86,20 @@ describe('needDelays', () => {
     expect(r.recommendation).toMatch(/Delay beneficial/)
     expect(r.levelDifferenceDb).toBeGreaterThan(0)
   })
+  it('compares real speakers when both max SPL figures are given', () => {
+    const same = value(needDelays({ ...base, mainDistance: 40, delayDistance: 5 }))
+    expect(same.mainSplAtListener).toBeNull()
+    const r = value(
+      needDelays({ ...base, mainDistance: 40, delayDistance: 5, mainSpl1m: 140, delaySpl1m: 128 }),
+    )
+    expect(r.levelDifferenceDb).toBeCloseTo(same.levelDifferenceDb - 12, 10)
+    expect(r.mainSplAtListener).toBeCloseTo(140 - 20 * Math.log10(r.mainPath), 10)
+    expect(r.delaySplAtListener).toBeCloseTo(128 - 20 * Math.log10(r.delayPath), 10)
+    // Only one figure: level difference still assumes the same speaker.
+    const one = value(needDelays({ ...base, mainDistance: 40, delayDistance: 5, mainSpl1m: 140 }))
+    expect(one.levelDifferenceDb).toBeCloseTo(same.levelDifferenceDb, 10)
+    expect(one.delaySplAtListener).toBeNull()
+  })
   it('does not recommend delays for small differences', () => {
     const r = value(needDelays({ ...base, mainDistance: 10, delayDistance: 8 }))
     expect(r.beneficial).toBe(false)

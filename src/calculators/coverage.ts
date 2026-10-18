@@ -144,8 +144,14 @@ export interface DelayCheck {
   delayPath: number
   delayMs: number
   differenceMs: number
-  /** Level advantage of the delay speaker over the mains at the listener (inverse square only). */
+  /**
+   * Level advantage of the delay speaker over the mains at the listener. Inverse square only,
+   * plus the two speakers' max SPL difference when both are given.
+   */
   levelDifferenceDb: number
+  /** Max SPL at the listener, when that speaker's 1 m figure is given. */
+  mainSplAtListener: number | null
+  delaySplAtListener: number | null
   beneficial: boolean
   recommendation: string
 }
@@ -159,6 +165,9 @@ export function needDelays(input: {
   delayDistance: number | null | undefined
   earHeight: number | null | undefined
   temperatureC: number | null | undefined
+  /** Optional max SPL at 1 m of each speaker; without both, the same speaker is assumed. */
+  mainSpl1m?: number | null
+  delaySpl1m?: number | null
 }): CalcResult<DelayCheck> {
   const err = firstError(
     requireNonNegative(input.mainHeight, 'main speaker height'),
@@ -189,7 +198,15 @@ export function needDelays(input: {
       delayPath,
       delayMs,
       differenceMs,
-      levelDifferenceDb: 20 * Math.log10(mainPath / delayPath),
+      levelDifferenceDb:
+        20 * Math.log10(mainPath / delayPath) +
+        (input.mainSpl1m != null && input.delaySpl1m != null
+          ? input.delaySpl1m - input.mainSpl1m
+          : 0),
+      mainSplAtListener:
+        input.mainSpl1m != null ? input.mainSpl1m - 20 * Math.log10(mainPath) : null,
+      delaySplAtListener:
+        input.delaySpl1m != null ? input.delaySpl1m - 20 * Math.log10(delayPath) : null,
       beneficial,
       recommendation,
     },
