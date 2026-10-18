@@ -4,6 +4,11 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { DelayTowerPlannerCard } from '../components/calculator/cards/delayTower'
 import { RiggingLoadCard } from '../components/calculator/cards/showTools'
 import {
+  AspectRatioCard,
+  InverseSquareCard,
+  NeedDelaysCard,
+} from '../components/calculator/cards/coverage'
+import {
   filterSpeakers,
   findSpeaker,
   getSplAt1m,
@@ -162,5 +167,51 @@ describe('speaker picker', () => {
     await user.clear(boxes)
     await user.type(boxes, '8')
     expect(screen.getByLabelText('Array weight')).toHaveValue('193.6')
+  })
+
+  it('compares the actual main and delay speakers in “Need delays?”', async () => {
+    const user = userEvent.setup()
+    render(<NeedDelaysCard />)
+    await user.click(screen.getByText('Compare the actual speakers'))
+    await user.click(screen.getByRole('button', { name: 'Pick the main speaker' }))
+    let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'lyon')
+    await user.click(within(dialog).getByRole('button', { name: /Meyer Sound LYON/ }))
+    expect(screen.getByLabelText('Main max SPL at 1 m')).toHaveValue('142')
+    expect(screen.getByText('Mains max at the listener')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Pick the delay speaker' }))
+    dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'qsc k12.2')
+    await user.click(within(dialog).getAllByRole('button', { name: /QSC K12\.2/ })[0])
+    expect(screen.getByLabelText('Delay max SPL at 1 m')).toHaveValue('132')
+    expect(screen.getByText(/difference between the two speakers/)).toBeInTheDocument()
+    expect(document.body.textContent).not.toMatch(/NaN|Infinity|undefined/)
+  })
+
+  it('fills level over distance and coverage shape from a speaker', async () => {
+    const user = userEvent.setup()
+    render(
+      <>
+        <InverseSquareCard />
+        <AspectRatioCard />
+      </>,
+    )
+    const [inverse, far] = screen.getAllByRole('button', {
+      name: 'Choose from the speaker library',
+    })
+    await user.click(inverse)
+    let dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
+    await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
+    expect(screen.getByLabelText('Reference SPL')).toHaveValue('141')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    await user.click(far)
+    dialog = await screen.findByRole('dialog', { name: 'Speaker library' })
+    await user.type(within(dialog).getByLabelText('Search speakers'), 'd&b j8')
+    await user.click(within(dialog).getByRole('button', { name: /d&b audiotechnik J8/ }))
+    expect(screen.getByLabelText('Coverage angle')).toHaveValue('100')
   })
 })

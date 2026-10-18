@@ -8,8 +8,10 @@ import {
 import { fmtDb, fmtDbSigned, fmtDistance, fmtMs, formatNumber } from '../../../calculators/format'
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
 import { useUnits } from '../../../hooks/useUnits'
-import { CalcCard, Inputs, Outputs } from '../CalcCard'
+import { getSplAt1m } from '../../../data/speakers'
+import { CalcCard, Inputs, Optional, Outputs } from '../CalcCard'
 import { NumberField, TemperatureField } from '../fields'
+import { SpeakerSelect } from '../SpeakerPicker'
 import { CalcError, Output, Rating, Verdict, Warnings } from '../outputs'
 import { useQ, useTemperature, v } from './shared'
 
@@ -25,6 +27,7 @@ export function InverseSquareCard() {
     refSpl: 110 as number | null,
     refDistance: 1 as number | null,
     targetDistance: 20 as number | null,
+    speaker: null as string | null,
   })
   const q = useQ()
   const { show, label } = useUnits()
@@ -49,6 +52,18 @@ export function InverseSquareCard() {
       }}
     >
       <Inputs>
+        <SpeakerSelect
+          speakerId={inp.speaker}
+          onClear={() => set('speaker', null)}
+          onSelect={(s) => {
+            const spl = getSplAt1m(s)
+            set('speaker', s.id)
+            if (spl !== null) {
+              set('refSpl', Math.round(spl * 10) / 10)
+              set('refDistance', 1)
+            }
+          }}
+        />
         <NumberField
           label="Reference SPL"
           hint="A level you know — e.g. a spec-sheet max SPL at 1 m, or a meter reading."
@@ -106,6 +121,7 @@ export function AspectRatioCard() {
     height: 4 as number | null,
     throwDistance: 15 as number | null,
     angle: 90 as number | null,
+    speaker: null as string | null,
   })
   const q = useQ()
   const { show, label } = useUnits()
@@ -143,6 +159,14 @@ export function AspectRatioCard() {
           kind="distance"
           value={inp.throwDistance}
           onChange={(x) => set('throwDistance', x)}
+        />
+        <SpeakerSelect
+          speakerId={inp.speaker}
+          onClear={() => set('speaker', null)}
+          onSelect={(sp) => {
+            set('speaker', sp.id)
+            if (sp.hCoverage !== null) set('angle', sp.hCoverage)
+          }}
         />
         <NumberField
           label="Coverage angle"
@@ -377,6 +401,10 @@ export function NeedDelaysCard() {
     mainDistance: 45 as number | null,
     delayDistance: 6 as number | null,
     earHeight: 1.2 as number | null,
+    mainSpeaker: null as string | null,
+    delaySpeaker: null as string | null,
+    mainSpl1m: null as number | null,
+    delaySpl1m: null as number | null,
   })
   const q = useQ()
   const { temperatureC, temperatureText } = useTemperature()
@@ -440,6 +468,50 @@ export function NeedDelaysCard() {
           onChange={(x) => set('earHeight', x)}
         />
         <TemperatureField />
+        <Optional
+          title="Compare the actual speakers"
+          active={inp.mainSpl1m !== null || inp.delaySpl1m !== null}
+        >
+          <SpeakerSelect
+            label="Pick the main speaker"
+            speakerId={inp.mainSpeaker}
+            initialCategory="line_array"
+            onClear={() => {
+              set('mainSpeaker', null)
+              set('mainSpl1m', null)
+            }}
+            onSelect={(s) => {
+              set('mainSpeaker', s.id)
+              set('mainSpl1m', getSplAt1m(s))
+            }}
+          />
+          <NumberField
+            label="Main max SPL at 1 m"
+            unit="dB"
+            value={inp.mainSpl1m}
+            onChange={(x) => set('mainSpl1m', x)}
+            hint="From the spec sheet. Leave blank to assume both speakers are the same."
+          />
+          <SpeakerSelect
+            label="Pick the delay speaker"
+            speakerId={inp.delaySpeaker}
+            initialCategory="point_source"
+            onClear={() => {
+              set('delaySpeaker', null)
+              set('delaySpl1m', null)
+            }}
+            onSelect={(s) => {
+              set('delaySpeaker', s.id)
+              set('delaySpl1m', getSplAt1m(s))
+            }}
+          />
+          <NumberField
+            label="Delay max SPL at 1 m"
+            unit="dB"
+            value={inp.delaySpl1m}
+            onChange={(x) => set('delaySpl1m', x)}
+          />
+        </Optional>
       </Inputs>
       {r.ok ? (
         <>
@@ -476,8 +548,28 @@ export function NeedDelaysCard() {
               unit="dB"
               secondary
               wide
-              help="Because it is closer to the listener (same speaker and power assumed)."
+              help={
+                inp.mainSpl1m !== null && inp.delaySpl1m !== null
+                  ? 'Distance plus the difference between the two speakers’ max SPL.'
+                  : 'Because it is closer to the listener (same speaker and power assumed).'
+              }
             />
+            {r.value.mainSplAtListener !== null && (
+              <Output
+                label="Mains max at the listener"
+                value={fmtDb(r.value.mainSplAtListener)}
+                unit="dB SPL"
+                secondary
+              />
+            )}
+            {r.value.delaySplAtListener !== null && (
+              <Output
+                label="Delay max at the listener"
+                value={fmtDb(r.value.delaySplAtListener)}
+                unit="dB SPL"
+                secondary
+              />
+            )}
           </Outputs>
         </>
       ) : (
