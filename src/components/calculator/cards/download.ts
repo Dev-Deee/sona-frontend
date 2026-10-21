@@ -1,6 +1,5 @@
-/** Triggers a browser download of a CSV string. */
-export function downloadCsv(filename: string, csv: string) {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+/** Triggers a browser download of a Blob. */
+export function downloadBlob(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -9,4 +8,9 @@ export function downloadCsv(filename: string, csv: string) {
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+/** Triggers a browser download of a CSV string. */
+export function downloadCsv(filename: string, csv: string) {
+  downloadBlob(filename, new Blob([csv], { type: 'text/csv;charset=utf-8' }))
 }
