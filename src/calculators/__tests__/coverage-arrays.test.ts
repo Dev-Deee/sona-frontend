@@ -3,6 +3,7 @@ import {
   aspectRatios,
   asymmetricCoverage,
   inverseSquare,
+  mountedHeight,
   needDelays,
   requiredCoverageAngle,
 } from '../coverage'
@@ -288,5 +289,19 @@ describe('uncoupledSpacing', () => {
   it('validates angle range', () => {
     expect(error(uncoupledSpacing(180, 3))).toMatch(/between/)
     expect(uncoupledSpacing(90, 0).ok).toBe(false)
+  })
+})
+
+describe('mountedHeight', () => {
+  it('uses the array centre when flown and the stack middle when ground-stacked', () => {
+    expect(mountedHeight('flown', 8, 1.2, 2)).toBe(8)
+    expect(mountedHeight('ground', 8, 1.2, 2)).toBeCloseTo(2.2, 10)
+    expect(mountedHeight('ground', 8, 0, 1.6)).toBeCloseTo(0.8, 10)
+  })
+  it('returns null for missing or impossible stacks', () => {
+    expect(mountedHeight('flown', null, 1, 1)).toBeNull()
+    expect(mountedHeight('ground', 8, null, 2)).toBeNull()
+    expect(mountedHeight('ground', 8, 1, 0)).toBeNull()
+    expect(mountedHeight('ground', 8, -1, 2)).toBeNull()
   })
 })

@@ -516,3 +516,25 @@ export function planDelayTowers(input: DelayPlanInput): CalcResult<DelayPlan> {
 
   return ok({ venue, mains, placement, speaker, towers })
 }
+
+// ─── Mounting ────────────────────────────────────────────────────────────────────────────────────
+
+export type Mounting = 'flown' | 'ground'
+
+/**
+ * Acoustic-centre height above the floor. Flown: the array centre as entered. Ground-stacked:
+ * the middle of the stack, standing on the stage or riser.
+ */
+export function mountedHeight(
+  mounting: Mounting,
+  flownCentreM: number | null | undefined,
+  stageM: number | null | undefined,
+  stackM: number | null | undefined,
+): number | null {
+  if (mounting === 'flown') return flownCentreM ?? null
+  if (stageM == null || stackM == null || stageM < 0 || stackM <= 0) return null
+  return stageM + stackM / 2
+}
+
+export const GROUND_STACK_NOTE =
+  'Ground-stacked: the audience is in the sound path, so bodies absorb high frequencies towards the back — expect the rear to sound duller and quieter than calculated. Delays (or a flown PA) help most here.'
