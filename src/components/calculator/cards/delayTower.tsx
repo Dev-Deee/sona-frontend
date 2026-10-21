@@ -3,6 +3,9 @@ import {
   planDelayTowers,
   type ActiveMode,
   type Check as CheckState,
+  GROUND_STACK_NOTE,
+  mountedHeight,
+  type Mounting,
   type PaConfig,
   type SpeakerType,
   type VenueType,
@@ -23,6 +26,7 @@ import { CalcCard } from '../CalcCard'
 import { speakerFill, type Speaker } from '../../../data/speakers'
 import { NumberField, Segmented, TemperatureField } from '../fields'
 import { SpeakerSelect } from '../SpeakerPicker'
+import { MountingFields } from './MountingFields'
 import {
   CalcError,
   Check,
@@ -116,6 +120,9 @@ export function DelayTowerPlannerCard() {
     depth: 60 as number | null,
     width: 40 as number | null,
     mainHeight: 8 as number | null,
+    mainMount: 'flown' as Mounting,
+    mainStage: 1.2 as number | null,
+    mainStack: 2 as number | null,
     mainBehind: 2 as number | null,
     earHeight: 1.2 as number | null,
     mainSensitivity: 100 as number | null,
@@ -171,7 +178,7 @@ export function DelayTowerPlannerCard() {
     mainMaxSpl: inp.mainMaxSpl,
     depthM: inp.depth,
     widthM: inp.width,
-    mainHeightM: inp.mainHeight,
+    mainHeightM: mountedHeight(inp.mainMount, inp.mainHeight, inp.mainStage, inp.mainStack),
     mainBehindM: inp.mainBehind,
     earHeightM: inp.earHeight,
     temperatureC,
@@ -200,6 +207,7 @@ export function DelayTowerPlannerCard() {
     mains && place
       ? place.needed && spk && towers
         ? [
+            ['Main PA', inp.mainMount === 'ground' ? 'Ground-stacked' : 'Flown'],
             ['Delay tower position', `${dist(place.fromFront)} ${u} from front row`],
             ['Delay setting', `${fmtMs(place.delaySettingMs)} ms`],
             ['Number of towers', String(towers.towers)],
@@ -283,12 +291,16 @@ export function DelayTowerPlannerCard() {
         onChange={(x) => set('width', x)}
         hint="At the widest point."
       />
-      <NumberField
-        label="Main speaker height"
-        kind="distance"
-        value={inp.mainHeight}
-        onChange={(x) => set('mainHeight', x)}
-        hint="Above the floor (for a flown array, its centre)."
+      <MountingFields
+        what="Main speaker"
+        mounting={inp.mainMount}
+        centre={inp.mainHeight}
+        stage={inp.mainStage}
+        stack={inp.mainStack}
+        onMounting={(m) => set('mainMount', m)}
+        onCentre={(x) => set('mainHeight', x)}
+        onStage={(x) => set('mainStage', x)}
+        onStack={(x) => set('mainStack', x)}
       />
       <NumberField
         label="Mains behind the front row"
@@ -325,6 +337,7 @@ export function DelayTowerPlannerCard() {
         inputs={venueInputs}
         results={
           <>
+            {inp.mainMount === 'ground' && <Note>{GROUND_STACK_NOTE}</Note>}
             <div className="col-span-2 flex flex-wrap items-center gap-2">
               <ConstantBadge
                 label={`Speed of sound at ${temperatureText}, ${formatNumber(inp.humidity, 0)}% RH`}
@@ -454,6 +467,7 @@ export function DelayTowerPlannerCard() {
         results={
           plan.value.mains.ok && mains ? (
             <>
+              {inp.mainMount === 'ground' && <Note>{GROUND_STACK_NOTE}</Note>}
               {inp.speakerType === 'active' && (
                 <Note>
                   Active speakers combine amplifier and speaker in one unit. Enter the max SPL from
