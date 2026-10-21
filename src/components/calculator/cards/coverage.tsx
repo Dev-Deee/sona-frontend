@@ -2,8 +2,11 @@ import {
   aspectRatios,
   asymmetricCoverage,
   inverseSquare,
+  GROUND_STACK_NOTE,
+  mountedHeight,
   needDelays,
   requiredCoverageAngle,
+  type Mounting,
 } from '../../../calculators/coverage'
 import { fmtDb, fmtDbSigned, fmtDistance, fmtMs, formatNumber } from '../../../calculators/format'
 import { usePublishResult, useCalcInputs } from '../../../hooks/useCalcInputs'
@@ -12,7 +15,8 @@ import { findSpeaker, getSplAt1m, type Speaker, speakerName } from '../../../dat
 import { CalcCard, Inputs, Outputs } from '../CalcCard'
 import { NumberField, TemperatureField } from '../fields'
 import { SpeakerSelect } from '../SpeakerPicker'
-import { CalcError, Check, Output, Rating, Verdict, Warnings } from '../outputs'
+import { MountingFields } from './MountingFields'
+import { CalcError, Check, Note, Output, Rating, Verdict, Warnings } from '../outputs'
 import { useQ, useTemperature, v } from './shared'
 
 const fmtDeg = (x: number) => formatNumber(x, 1)
@@ -458,6 +462,9 @@ export function NeedDelaysCard() {
   const id = 'coverage.delays'
   const [inp, set] = useCalcInputs(id, {
     mainHeight: 8 as number | null,
+    mainMount: 'flown' as Mounting,
+    mainStage: 1.2 as number | null,
+    mainStack: 2 as number | null,
     delayHeight: 4 as number | null,
     mainDistance: 45 as number | null,
     delayDistance: 6 as number | null,
@@ -470,7 +477,11 @@ export function NeedDelaysCard() {
   const q = useQ()
   const { temperatureC, temperatureText } = useTemperature()
   const { show, label } = useUnits()
-  const r = needDelays({ ...inp, temperatureC })
+  const r = needDelays({
+    ...inp,
+    mainHeight: mountedHeight(inp.mainMount, inp.mainHeight, inp.mainStage, inp.mainStack),
+    temperatureC,
+  })
   usePublishResult(
     id,
     r.ok
@@ -513,12 +524,16 @@ export function NeedDelaysCard() {
           onChange={(x) => set('mainSpl1m', x)}
           hint="Filled when you pick a speaker. Leave blank to assume both speakers are the same."
         />
-        <NumberField
-          label="Main speaker height"
-          hint="Height of the main PA above the floor."
-          kind="distance"
-          value={inp.mainHeight}
-          onChange={(x) => set('mainHeight', x)}
+        <MountingFields
+          what="Main speaker"
+          mounting={inp.mainMount}
+          centre={inp.mainHeight}
+          stage={inp.mainStage}
+          stack={inp.mainStack}
+          onMounting={(m) => set('mainMount', m)}
+          onCentre={(x) => set('mainHeight', x)}
+          onStage={(x) => set('mainStage', x)}
+          onStack={(x) => set('mainStack', x)}
         />
         <NumberField
           label="Main → listener (horizontal)"
@@ -587,6 +602,7 @@ export function NeedDelaysCard() {
               tone={r.value.beneficial ? 'warn' : 'good'}
             />
             <Verdict>{r.value.recommendation}</Verdict>
+            {inp.mainMount === 'ground' && <Note>{GROUND_STACK_NOTE}</Note>}
             <Output
               label="Mains → listener"
               value={dist(r.value.mainPath)}
