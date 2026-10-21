@@ -54,7 +54,8 @@ import {
   ImpedanceCard,
   NoiseDoseCard,
 } from '../components/calculator/cards/powerElectrical'
-import { InputListCard, RiggingLoadCard } from '../components/calculator/cards/showTools'
+import { PatchSheetCard } from '../components/calculator/cards/patchSheet'
+import { RiggingLoadCard } from '../components/calculator/cards/showTools'
 import {
   CableGaugeReference,
   FormulasReference,
@@ -464,11 +465,12 @@ export const CALCULATORS: Record<TabId, CalcEntry[]> = {
   'show-tools': [
     {
       slug: 'input-list',
-      label: 'Input list',
-      tech: 'Channel list',
-      question: 'Build and export an input list',
-      keywords: 'input list channel patch csv',
-      component: InputListCard,
+      label: 'Patch sheet',
+      tech: 'Inputs, DCAs, buses, outputs',
+      question: 'Build and share the show patch',
+      keywords:
+        'input list channel patch sheet dca bus mix output matrix p16 iem monitor csv excel xlsx pdf whatsapp',
+      component: PatchSheetCard,
       calcId: 'show-tools.inputList',
     },
     {

@@ -5,7 +5,6 @@ import { WavelengthCard } from '../components/calculator/cards/acoustics'
 import { BpmCard } from '../components/calculator/cards/timingSync'
 import { CableLossCard, SummationCard } from '../components/calculator/cards/gainSignal'
 import { FrequencyCoordinationCard } from '../components/calculator/cards/rfWireless'
-import { InputListCard } from '../components/calculator/cards/showTools'
 import { DelayTowerPlannerCard } from '../components/calculator/cards/delayTower'
 import { NoiseDoseCard } from '../components/calculator/cards/powerElectrical'
 import { AddSubtractDbCard } from '../components/calculator/cards/gainSignal'
@@ -117,23 +116,6 @@ describe('calculator interactions', () => {
     )
     await user.click(within(region).getByRole('button', { name: /Add frequency/ }))
     expect(within(region).getByLabelText('Channel 4')).toBeInTheDocument()
-  })
-
-  it('input list adds, reorders and removes channels', async () => {
-    const user = userEvent.setup()
-    render(<InputListCard />)
-    const region = card('Input List Generator')
-    const sources = () =>
-      within(region)
-        .getAllByLabelText('Source')
-        .map((i) => (i as HTMLInputElement).value)
-    expect(sources()).toEqual(['Kick In', 'Snare Top', 'Lead Vox'])
-    await user.click(within(region).getByRole('button', { name: 'Move channel 1 down' }))
-    expect(sources()).toEqual(['Snare Top', 'Kick In', 'Lead Vox'])
-    await user.click(within(region).getByRole('button', { name: 'Remove channel 3' }))
-    expect(sources()).toEqual(['Snare Top', 'Kick In'])
-    await user.click(within(region).getByRole('button', { name: /Add channel/ }))
-    expect(sources()).toHaveLength(3)
   })
 
   it('explains itself and reveals the formula on demand', async () => {

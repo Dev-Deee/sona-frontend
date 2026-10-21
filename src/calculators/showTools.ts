@@ -26,7 +26,7 @@ function csvCell(value: string | number | boolean): string {
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 
-/** RFC 4180 CSV with channels renumbered in list order. */
+/** Legacy single-list CSV (kept for lists saved before the patch sheet). */
 export function inputListToCsv(rows: InputChannel[]): string {
   const lines = [INPUT_LIST_HEADERS.map(csvCell).join(',')]
   rows.forEach((row, index) => {
