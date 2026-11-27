@@ -27,4 +27,6 @@ coverage
 dev-dist
 
 # Local env (".env.production" holds only public values and is committed)
-config.bat
+.vscode/*
+.env
+.env.local
